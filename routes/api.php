@@ -17,3 +17,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::apiResources([
+  'votes' => App\Http\Controllers\API\VoteController::class,
+  'rankings' => App\Http\Controllers\API\RankingController::class,
+  'nominations' => App\Http\Controllers\API\NominationController::class
+]);
+
+Route::get('voters/{position_id}', 'App\Http\Controllers\API\VoteController@getVoters');
