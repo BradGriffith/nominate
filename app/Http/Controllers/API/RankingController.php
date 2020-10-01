@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Nomination;
+use App\Models\Position;
+use App\Models\Ranking;
+use App\Models\Vote;
 use Illuminate\Http\Request;
 
 class RankingController extends Controller
@@ -39,26 +43,35 @@ class RankingController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+    public function getNominees($position_id) {
+        $nominee_min_count = Position::where('id',$position_id)->first()->num_to_select;
+
+        //get the top $nominee_min_count nominees by number of votes
+        $nominees = Nomination::withCount('votes')->orderBy('votes_count','desc')->limit($nominee_min_count)->get();
+
+        // find the minimum number of votes you'd have to get to tie for last place
+        $min_votes = $nominees[min(count($nominees), $nominee_min_count)-1]->votes_count;
+
+        // get all nominees with at least as many votes as the nominee in $nominee_min_count-th place
+        $nominees_final = Nomination::withCount('votes')->having('votes_count','>=', $min_votes)->get();
+
+        return $nominees_final;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+    public function getRankers($position_id) {
+      $already_ranked = Ranking::where('position_id', $position_id)
+        ->where('year', date('Y'))
+        ->pluck('voter');
+
+      $voters = [];
+      for($i = 1;$i <= 24;$i++) {
+        if(in_array($i, $already_ranked->toArray())) {
+          continue;
+        };
+
+        $voters[] = $i;
+      }
+
+      return $voters;
     }
 }

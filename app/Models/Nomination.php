@@ -16,4 +16,8 @@ class Nomination extends Model
     public $appends = [
       'name',
     ];
+
+    public function votes() {
+      return $this->hasMany('App\Models\Vote');
+    }
 }

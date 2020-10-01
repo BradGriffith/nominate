@@ -20,8 +20,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResources([
   'votes' => App\Http\Controllers\API\VoteController::class,
-  'rankings' => App\Http\Controllers\API\RankingController::class,
+  'positions' => App\Http\Controllers\API\PositionController::class,
+  'ranks' => App\Http\Controllers\API\RankingController::class,
   'nominations' => App\Http\Controllers\API\NominationController::class
 ]);
 
 Route::get('voters/{position_id}', 'App\Http\Controllers\API\VoteController@getVoters');
+Route::get('rankers/{position_id}', 'App\Http\Controllers\API\RankingController@getRankers');
+
+Route::get('ranks/nominees/{position_id}', 'App\Http\Controllers\API\RankingController@getNominees');

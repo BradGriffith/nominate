@@ -1,10 +1,6 @@
 <template>
     <div>
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
-            <div>
-                <application-logo class="block h-32 w-auto" />
-            </div>
-
             <div class="mt-8 text-2xl">
                 Welcome to FCC Nominations!
             </div>
@@ -45,36 +41,42 @@
 </template>
 
 <script>
-    import ApplicationLogo from './ApplicationLogo'
     import axios from 'axios';
 
     export default {
         components: {
-            ApplicationLogo,
         },
         data: function() {
             return {
               votesAllowed: 10,
-              voterNumbers: [1,2,3,4],
+              voterNumbers: [],
               votes: [],
               voter: 0,
               votesCast: false,
               votersCompleted: [],
-              position_id: 1,
               nominees: [
               ]
             };
         },
+        props: [
+          'position_id'
+        ],
         computed: {
           votesRemaining: function() { return this.votesAllowed - this.votes.length; },
           canSubmit () { return this.votes.length > 0; },
         },
         mounted () {
           axios
+            .get('/api/positions/' + this.position_id)
+            .then(response => {
+              this.position = response.data;
+              this.votesAllowed = response.data.num_to_select;
+            });
+          axios
             .get('/api/voters/' + this.position_id)
             .then(response => (this.voterNumbers = response.data));
           axios
-            .get('/api/nominations')
+            .get('/api/nominations?position_id=' + this.position_id)
             .then(response => (this.nominees = response.data));
         },
         methods: {

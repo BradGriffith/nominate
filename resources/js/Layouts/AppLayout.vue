@@ -17,6 +17,15 @@
                             <jet-nav-link href="/dashboard" :active="$page.currentRouteName == 'dashboard'">
                                 Nominations
                             </jet-nav-link>
+                            <jet-nav-link href="/vote" :active="$page.currentRouteName == 'vote'">
+                                Vote
+                            </jet-nav-link>
+                            <jet-nav-link href="/rank" :active="$page.currentRouteName == 'rank'">
+                                Rank
+                            </jet-nav-link>
+                            <jet-nav-link href="/results" :active="$page.currentRouteName == 'results'">
+                                Results
+                            </jet-nav-link>
                         </div>
                     </div>
 
