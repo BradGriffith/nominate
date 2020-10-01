@@ -22,7 +22,7 @@ class CreateVotes extends Migration
             $table->timestamps();
             $table->foreign('position_id')->references('id')->on('positions');
 
-            $table->foreign('nomination_id')->references('id')->on('positions');
+            $table->foreign('nomination_id')->references('id')->on('nominations');
         });
     }
 
