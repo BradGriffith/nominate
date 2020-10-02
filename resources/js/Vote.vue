@@ -36,7 +36,8 @@
                     <strong :class="{ 'done-voting': votesRemaining == 0 }">{{ votesRemaining }}</strong> selections remaining
                   </li>
                 </ul>
-                <input type="submit" value="Vote" @click="postVotes" @click.prevent="!canSubmit" />
+                <p class="warning bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" v-if="votesRemaining < 0">You have selected too many nominees. Please remove {{ -1*votesRemaining }} before casting your votes.</p>
+                <input type="submit" value="Vote" @click="postVotes" :disabled="!canSubmit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-2 rounded" />
                 </div>
               </fieldset>
             </form>
@@ -67,7 +68,7 @@
         ],
         computed: {
           votesRemaining: function() { return this.votesAllowed - this.votes.length; },
-          canSubmit () { return this.votes.length > 0; },
+          canSubmit () { return this.votes.length > 0 && this.votes.length <= this.votesAllowed; },
         },
         mounted () {
           axios
