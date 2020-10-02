@@ -68,13 +68,22 @@ class RankingController extends Controller
         $nominee_min_count = Position::where('id',$position_id)->first()->num_to_select;
 
         //get the top $nominee_min_count nominees by number of votes
-        $nominees = Nomination::withCount('votes')->orderBy('votes_count','desc')->limit($nominee_min_count)->get();
+        $nominees = Nomination::withCount('votes')
+            ->where('position',$position_id)
+            ->where('year', date('Y'))
+            ->orderBy('votes_count','desc')
+            ->limit($nominee_min_count)
+            ->get();
 
         // find the minimum number of votes you'd have to get to tie for last place
         $min_votes = $nominees[min(count($nominees), $nominee_min_count)-1]->votes_count;
 
         // get all nominees with at least as many votes as the nominee in $nominee_min_count-th place
-        $nominees_final = Nomination::withCount('votes')->having('votes_count','>=', $min_votes)->get();
+        $nominees_final = Nomination::withCount('votes')
+            ->where('position',$position_id)
+            ->where('year', date('Y'))
+            ->having('votes_count','>=', $min_votes)
+            ->get();
 
         return $nominees_final;
     }
