@@ -29,7 +29,28 @@ class RankingController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $voter = $request->input('voter');
+        $position_id = $request->input('position_id');
+        $year = date('Y');
+
+        // Check if votes have been submitted yet
+
+        $ranks = [];
+        foreach($request->input('ranks') as $rank => $nomination_id) {
+            if(empty($nomination_id)) {
+                continue;
+            }
+
+          $ranks[] = compact([
+            'voter',
+            'position_id',
+            'nomination_id',
+            'year',
+            'rank',
+          ]);
+        }
+
+        return Ranking::insert($ranks);
     }
 
     /**

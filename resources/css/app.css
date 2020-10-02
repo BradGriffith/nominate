@@ -79,8 +79,19 @@ ul.nominees li {
     padding: 10px 0;
 }
 
+ol.ranked {
+    list-style: decimal;
+    padding-left: 40px;
+}
+
+.vote-summary {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+}
+
 @media(min-width:481px) {
-    ul.nominees {
+    .vote ul.nominees {
         column-count: 3;
     }
 }
