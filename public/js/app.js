@@ -4428,6 +4428,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {},
@@ -4437,13 +4453,19 @@ __webpack_require__.r(__webpack_exports__);
       voterNumbers: [],
       ranks: [],
       ranksCast: false,
-      ranksCompleted: [],
       nominees: []
     };
   },
   computed: {
+    ranksCompleted: function ranksCompleted() {
+      return this.ranks.filter(function (r) {
+        return r;
+      }).length;
+    },
     ranksRemaining: function ranksRemaining() {
-      return this.nominees.length - this.ranks.length;
+      return this.nominees.length - this.ranks.filter(function (r) {
+        return r;
+      }).length;
     },
     rankingOptions: function rankingOptions() {
       return Array.from({
@@ -4453,7 +4475,9 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     canSubmit: function canSubmit() {
-      return this.ranks.length > 0;
+      this.ranks.filter(function (r) {
+        return r === null;
+      }).length == 0;
     }
   },
   mounted: function mounted() {
@@ -4478,6 +4502,27 @@ __webpack_require__.r(__webpack_exports__);
         console.log(resp);
         _this2.ranksCast = true;
       });
+    },
+    getNomineeByRank: function getNomineeByRank(i) {
+      var nominees = document.querySelectorAll('select option:checked[value="' + i + '"]');
+      var names = [];
+
+      if (!nominees.length) {
+        return [];
+      }
+
+      nominees.forEach(function (nominee) {
+        var name = nominee.parentElement.nextSibling.textContent.trim();
+
+        if (name.length) {
+          names.push(name);
+        }
+      });
+      return names;
+    },
+    getNomineeNameByRank: function getNomineeNameByRank(i) {
+      var names = this.getNomineeByRank(i);
+      return names.join(' AND ');
     }
   }
 });
@@ -4589,6 +4634,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {},
@@ -4609,7 +4659,7 @@ __webpack_require__.r(__webpack_exports__);
       return this.votesAllowed - this.votes.length;
     },
     canSubmit: function canSubmit() {
-      return this.votes.length > 0;
+      return this.votes.length > 0 && this.votes.length <= this.votesAllowed;
     }
   },
   mounted: function mounted() {
@@ -28235,104 +28285,188 @@ var render = function() {
                       _vm._v("-- Select your voter number --")
                     ]),
                     _vm._v(" "),
-                    _vm._l(_vm.voterNumbers, function(voter) {
-                      return _c("option", { domProps: { value: voter } }, [
-                        _vm._v(_vm._s(voter))
+                    _vm._l(_vm.voterNumbers, function(voter_num) {
+                      return _c("option", { domProps: { value: voter_num } }, [
+                        _vm._v(_vm._s(voter_num))
                       ])
                     })
                   ],
                   2
                 ),
                 _vm._v(" "),
-                _vm.voter
-                  ? _c("div", [
-                      _c(
-                        "ul",
-                        { staticClass: "nominees" },
-                        _vm._l(_vm.nominees, function(nominee) {
-                          return _c("li", [
+                _c("div", [
+                  _vm.voter
+                    ? _c("div", { staticClass: "md:flex md:flex-wrap" }, [
+                        _c(
+                          "div",
+                          {
+                            staticClass: "flex-1 bg-gray-100 rounded-lg p-2 m-2"
+                          },
+                          [
                             _c(
-                              "select",
+                              "ul",
                               {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.ranks,
-                                    expression: "ranks"
-                                  }
-                                ],
-                                attrs: { id: "vote-" + nominee.id },
-                                on: {
-                                  change: function($event) {
-                                    var $$selectedVal = Array.prototype.filter
-                                      .call($event.target.options, function(o) {
-                                        return o.selected
+                                staticClass: "nominees rankings flex flex-wrap"
+                              },
+                              _vm._l(_vm.nominees, function(nominee) {
+                                return _c("li", { staticClass: "w-1/2" }, [
+                                  _c(
+                                    "select",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.ranks[nominee.id],
+                                          expression: "ranks[nominee.id]"
+                                        }
+                                      ],
+                                      attrs: { id: "vote-" + nominee.id },
+                                      on: {
+                                        change: function($event) {
+                                          var $$selectedVal = Array.prototype.filter
+                                            .call(
+                                              $event.target.options,
+                                              function(o) {
+                                                return o.selected
+                                              }
+                                            )
+                                            .map(function(o) {
+                                              var val =
+                                                "_value" in o
+                                                  ? o._value
+                                                  : o.value
+                                              return val
+                                            })
+                                          _vm.$set(
+                                            _vm.ranks,
+                                            nominee.id,
+                                            $event.target.multiple
+                                              ? $$selectedVal
+                                              : $$selectedVal[0]
+                                          )
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _c("option", { attrs: { vale: "" } }),
+                                      _vm._v(" "),
+                                      _vm._l(_vm.rankingOptions, function(
+                                        rank
+                                      ) {
+                                        return _c(
+                                          "option",
+                                          { domProps: { value: rank } },
+                                          [_vm._v(_vm._s(rank))]
+                                        )
                                       })
-                                      .map(function(o) {
-                                        var val =
-                                          "_value" in o ? o._value : o.value
-                                        return val
-                                      })
-                                    _vm.ranks = $event.target.multiple
-                                      ? $$selectedVal
-                                      : $$selectedVal[0]
-                                  }
-                                }
+                                    ],
+                                    2
+                                  ),
+                                  _vm._v(
+                                    " " +
+                                      _vm._s(nominee.name) +
+                                      "\n              "
+                                  )
+                                ])
+                              }),
+                              0
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          {
+                            staticClass: "flex-1 bg-gray-200 rounded-lg p-2 m-2"
+                          },
+                          [
+                            _vm._v(
+                              "\n\n            Ranked Nominees:\n            "
+                            ),
+                            _c(
+                              "ol",
+                              { staticClass: "ranked" },
+                              _vm._l(_vm.nominees, function(nominee, i) {
+                                return _c("li", [
+                                  _vm._v(
+                                    _vm._s(_vm.getNomineeNameByRank(i + 1))
+                                  )
+                                ])
+                              }),
+                              0
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "ul",
+                              {
+                                staticClass: "rank-summary",
+                                staticStyle: { display: "none" }
                               },
                               [
-                                _c("option", { attrs: { vale: "" } }),
+                                _c("li", [
+                                  _c("strong", [
+                                    _vm._v(_vm._s(_vm.ranksCompleted))
+                                  ]),
+                                  _vm._v(" nominees ranked\n              ")
+                                ]),
                                 _vm._v(" "),
-                                _vm._l(_vm.rankingOptions, function(rank) {
-                                  return _c(
-                                    "option",
-                                    { domProps: { value: rank } },
-                                    [_vm._v(_vm._s(rank))]
+                                _c("li", [
+                                  _c(
+                                    "strong",
+                                    {
+                                      class: {
+                                        "done-voting": _vm.ranksRemaining == 0
+                                      }
+                                    },
+                                    [_vm._v(_vm._s(_vm.ranksRemaining))]
+                                  ),
+                                  _vm._v(
+                                    " selections remaining\n              "
                                   )
-                                })
-                              ],
-                              2
+                                ])
+                              ]
                             ),
-                            _vm._v(
-                              " " + _vm._s(nominee.name) + "\n              "
-                            )
-                          ])
-                        }),
-                        0
-                      ),
-                      _vm._v(" "),
-                      _c("ul", { staticClass: "rank-summary" }, [
-                        _c("li", [
-                          _c("strong", [_vm._v(_vm._s(_vm.ranks.length))]),
-                          _vm._v(" nominees ranked\n              ")
-                        ]),
-                        _vm._v(" "),
-                        _c("li", [
-                          _c(
-                            "strong",
-                            {
-                              class: { "done-voting": _vm.ranksRemaining == 0 }
-                            },
-                            [_vm._v(_vm._s(_vm.ranksRemaining))]
-                          ),
-                          _vm._v(" selections remaining\n              ")
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("input", {
-                        attrs: { type: "submit", value: "Vote" },
-                        on: {
-                          click: [
-                            _vm.postVotes,
-                            function($event) {
-                              $event.preventDefault()
-                              !_vm.canSubmit
-                            }
+                            _vm._v(" "),
+                            _vm.ranksRemaining < 0
+                              ? _c(
+                                  "p",
+                                  {
+                                    staticClass:
+                                      "warning bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                                  },
+                                  [
+                                    _vm._v(
+                                      "You must rank all nominees before submitting. You're still missing " +
+                                        _vm._s(_vm.rankingsRemaining) +
+                                        " rankings."
+                                    )
+                                  ]
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _c("input", {
+                              staticClass:
+                                "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-2 rounded",
+                              attrs: {
+                                type: "submit",
+                                value: "Submit Rankings"
+                              },
+                              on: {
+                                click: [
+                                  _vm.postVotes,
+                                  function($event) {
+                                    $event.preventDefault()
+                                    !_vm.canSubmit
+                                  }
+                                ]
+                              }
+                            })
                           ]
-                        }
-                      })
-                    ])
-                  : _vm._e()
+                        )
+                      ])
+                    : _vm._e()
+                ])
               ])
             ])
           : _vm._e()
@@ -28413,7 +28547,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
+  return _c("div", { staticClass: "vote" }, [
     _c(
       "div",
       { staticClass: "p-6 sm:px-20 bg-white border-b border-gray-200" },
@@ -28488,7 +28622,11 @@ var render = function() {
                               "label",
                               { staticClass: "checkmark-container" },
                               [
-                                _vm._v(_vm._s(nominee.name) + " "),
+                                _vm._v(
+                                  "\n                  " +
+                                    _vm._s(nominee.name) +
+                                    "\n                  "
+                                ),
                                 _c("input", {
                                   directives: [
                                     {
@@ -28531,6 +28669,7 @@ var render = function() {
                                     }
                                   }
                                 }),
+                                _vm._v(" "),
                                 _c("span", { staticClass: "checkmark" })
                               ]
                             )
@@ -28539,35 +28678,56 @@ var render = function() {
                         0
                       ),
                       _vm._v(" "),
-                      _c("ul", { staticClass: "vote-summary" }, [
-                        _c("li", [
-                          _c("strong", [_vm._v(_vm._s(_vm.votes.length))]),
-                          _vm._v(" nominees selected\n              ")
-                        ]),
-                        _vm._v(" "),
-                        _c("li", [
-                          _c(
-                            "strong",
+                      _c(
+                        "ul",
+                        { staticClass: "vote-summary bg-gray-400 p-3" },
+                        [
+                          _c("li", [
+                            _c("strong", [_vm._v(_vm._s(_vm.votes.length))]),
+                            _vm._v(" nominees selected\n              ")
+                          ]),
+                          _vm._v(" "),
+                          _c("li", [
+                            _c(
+                              "strong",
+                              {
+                                class: {
+                                  "done-voting": _vm.votesRemaining == 0
+                                }
+                              },
+                              [_vm._v(_vm._s(_vm.votesRemaining))]
+                            ),
+                            _vm._v(" selections remaining\n              ")
+                          ])
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _vm.votesRemaining < 0
+                        ? _c(
+                            "p",
                             {
-                              class: { "done-voting": _vm.votesRemaining == 0 }
+                              staticClass:
+                                "warning bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
                             },
-                            [_vm._v(_vm._s(_vm.votesRemaining))]
-                          ),
-                          _vm._v(" selections remaining\n              ")
-                        ])
-                      ]),
+                            [
+                              _vm._v(
+                                "You have selected too many nominees. Please remove " +
+                                  _vm._s(-1 * _vm.votesRemaining) +
+                                  " before casting your votes."
+                              )
+                            ]
+                          )
+                        : _vm._e(),
                       _vm._v(" "),
                       _c("input", {
-                        attrs: { type: "submit", value: "Vote" },
-                        on: {
-                          click: [
-                            _vm.postVotes,
-                            function($event) {
-                              $event.preventDefault()
-                              !_vm.canSubmit
-                            }
-                          ]
-                        }
+                        staticClass:
+                          "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-2 rounded",
+                        attrs: {
+                          type: "submit",
+                          value: "Vote",
+                          disabled: !_vm.canSubmit
+                        },
+                        on: { click: _vm.postVotes }
                       })
                     ])
                   : _vm._e()
