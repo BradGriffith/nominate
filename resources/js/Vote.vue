@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="vote">
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
             <div class="mt-8 text-2xl">
                 Welcome to FCC Nominations!
@@ -21,10 +21,14 @@
                 <div v-if="voter">
                 <ul class="nominees">
                   <li v-for="nominee in nominees">
-                    <label class="checkmark-container">{{ nominee.name }} <input type="checkbox" :id="'vote-' + nominee.id" :value="nominee.id" v-model="votes"><span class="checkmark"></span></label>
+                    <label class="checkmark-container">
+                      {{ nominee.name }}
+                      <input type="checkbox" :id="'vote-' + nominee.id" :value="nominee.id" v-model="votes">
+                      <span class="checkmark"></span>
+                    </label>
                   </li>
                 </ul>
-                <ul class="vote-summary">
+                <ul class="vote-summary bg-gray-400 p-3">
                   <li>
                     <strong>{{ votes.length }}</strong> nominees selected
                   </li>
