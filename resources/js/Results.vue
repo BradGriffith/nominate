@@ -9,7 +9,7 @@
                 We have our results! Below is the ranked list of nominees for this position.
             </div>
 
-            <ol class="nominees">
+            <ol class="results">
                 <li v-for="nominee in nominees">
                 {{ nominee.name }}
                 </li>
@@ -25,18 +25,14 @@
         components: {
         },
         props: [
-          'position_id'
+          'position_id',
+          'nominees'
         ],
         data: function() {
             return {
-              nominees: [
-              ]
             };
         },
         mounted () {
-          axios
-            .get('/api/results')
-            .then(response => (this.nominees = response.data));
         },
         methods: {
         }

@@ -79,7 +79,8 @@ ul.nominees li {
     padding: 10px 0;
 }
 
-ol.ranked {
+ol.ranked,
+ol.results {
     list-style: decimal;
     padding-left: 40px;
 }

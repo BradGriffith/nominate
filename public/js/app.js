@@ -4563,19 +4563,11 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {},
-  props: ['position_id'],
+  props: ['position_id', 'nominees'],
   data: function data() {
-    return {
-      nominees: []
-    };
+    return {};
   },
-  mounted: function mounted() {
-    var _this = this;
-
-    axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/results').then(function (response) {
-      return _this.nominees = response.data;
-    });
-  },
+  mounted: function mounted() {},
   methods: {}
 });
 
@@ -4592,6 +4584,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+//
 //
 //
 //
@@ -28137,7 +28130,14 @@ var render = function() {
           _c(
             "div",
             { staticClass: "bg-white overflow-hidden shadow-xl sm:rounded-lg" },
-            [_c("results")],
+            [
+              _c("results", {
+                attrs: {
+                  position_id: _vm.$page["position_id"],
+                  nominees: _vm.$page["nominees"]
+                }
+              })
+            ],
             1
           )
         ])
@@ -28249,7 +28249,7 @@ var render = function() {
           ? _c("form", [
               _c("fieldset", [
                 _c("label", { attrs: { for: "voter" } }, [
-                  _vm._v("Select your Voter Number:")
+                  _vm._v("Select Your Voter Number:")
                 ]),
                 _vm._v(" "),
                 _c(
@@ -28282,7 +28282,7 @@ var render = function() {
                   },
                   [
                     _c("option", { attrs: { value: "" } }, [
-                      _vm._v("-- Select your voter number --")
+                      _vm._v("-- Select Your voter number --")
                     ]),
                     _vm._v(" "),
                     _vm._l(_vm.voterNumbers, function(voter_num) {
@@ -28513,7 +28513,7 @@ var render = function() {
         _vm._v(" "),
         _c(
           "ol",
-          { staticClass: "nominees" },
+          { staticClass: "results" },
           _vm._l(_vm.nominees, function(nominee) {
             return _c("li", [
               _vm._v("\n            " + _vm._s(nominee.name) + "\n            ")
@@ -28569,6 +28569,10 @@ var render = function() {
         !_vm.votesCast
           ? _c("form", [
               _c("fieldset", [
+                _c("label", { attrs: { for: "voter" } }, [
+                  _vm._v("Select Your Voter Number:")
+                ]),
+                _vm._v(" "),
                 _c(
                   "select",
                   {
@@ -28599,7 +28603,7 @@ var render = function() {
                   },
                   [
                     _c("option", { attrs: { value: "" } }, [
-                      _vm._v("-- Select your voter number --")
+                      _vm._v("-- Select Your voter number --")
                     ]),
                     _vm._v(" "),
                     _vm._l(_vm.voterNumbers, function(voter) {
