@@ -20,4 +20,8 @@ class Nomination extends Model
     public function votes() {
       return $this->hasMany('App\Models\Vote');
     }
+
+    public function ranks() {
+      return $this->hasMany('App\Models\Ranking');
+    }
 }
