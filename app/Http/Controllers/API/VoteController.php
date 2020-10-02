@@ -46,20 +46,7 @@ class VoteController extends Controller
     }
 
     public function getVoters($position_id) {
-      $already_voted = Vote::where('position_id', $position_id)
-        ->where('year', date('Y'))
-        ->pluck('voter');
-
-      $voters = [];
-      for($i = 1;$i <= 24;$i++) {
-        if(in_array($i, $already_voted->toArray())) {
-          continue;
-        };
-
-        $voters[] = $i;
-      }
-
-      return $voters;
+      return Vote::getUnvotedVoters($position_id);
     }
 
     /**
