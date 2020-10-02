@@ -28484,49 +28484,56 @@ var render = function() {
                         { staticClass: "nominees" },
                         _vm._l(_vm.nominees, function(nominee) {
                           return _c("li", [
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.votes,
-                                  expression: "votes"
-                                }
-                              ],
-                              attrs: {
-                                type: "checkbox",
-                                id: "vote-" + nominee.id
-                              },
-                              domProps: {
-                                value: nominee.id,
-                                checked: Array.isArray(_vm.votes)
-                                  ? _vm._i(_vm.votes, nominee.id) > -1
-                                  : _vm.votes
-                              },
-                              on: {
-                                change: function($event) {
-                                  var $$a = _vm.votes,
-                                    $$el = $event.target,
-                                    $$c = $$el.checked ? true : false
-                                  if (Array.isArray($$a)) {
-                                    var $$v = nominee.id,
-                                      $$i = _vm._i($$a, $$v)
-                                    if ($$el.checked) {
-                                      $$i < 0 && (_vm.votes = $$a.concat([$$v]))
-                                    } else {
-                                      $$i > -1 &&
-                                        (_vm.votes = $$a
-                                          .slice(0, $$i)
-                                          .concat($$a.slice($$i + 1)))
+                            _c(
+                              "label",
+                              { staticClass: "checkmark-container" },
+                              [
+                                _vm._v(_vm._s(nominee.name) + " "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.votes,
+                                      expression: "votes"
                                     }
-                                  } else {
-                                    _vm.votes = $$c
+                                  ],
+                                  attrs: {
+                                    type: "checkbox",
+                                    id: "vote-" + nominee.id
+                                  },
+                                  domProps: {
+                                    value: nominee.id,
+                                    checked: Array.isArray(_vm.votes)
+                                      ? _vm._i(_vm.votes, nominee.id) > -1
+                                      : _vm.votes
+                                  },
+                                  on: {
+                                    change: function($event) {
+                                      var $$a = _vm.votes,
+                                        $$el = $event.target,
+                                        $$c = $$el.checked ? true : false
+                                      if (Array.isArray($$a)) {
+                                        var $$v = nominee.id,
+                                          $$i = _vm._i($$a, $$v)
+                                        if ($$el.checked) {
+                                          $$i < 0 &&
+                                            (_vm.votes = $$a.concat([$$v]))
+                                        } else {
+                                          $$i > -1 &&
+                                            (_vm.votes = $$a
+                                              .slice(0, $$i)
+                                              .concat($$a.slice($$i + 1)))
+                                        }
+                                      } else {
+                                        _vm.votes = $$c
+                                      }
+                                    }
                                   }
-                                }
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("label", [_vm._v(_vm._s(nominee.name))])
+                                }),
+                                _c("span", { staticClass: "checkmark" })
+                              ]
+                            )
                           ])
                         }),
                         0

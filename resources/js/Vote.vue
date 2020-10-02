@@ -21,7 +21,7 @@
                 <div v-if="voter">
                 <ul class="nominees">
                   <li v-for="nominee in nominees">
-                    <input type="checkbox" :id="'vote-' + nominee.id" :value="nominee.id" v-model="votes"> <label>{{ nominee.name }}</label>
+                    <label class="checkmark-container">{{ nominee.name }} <input type="checkbox" :id="'vote-' + nominee.id" :value="nominee.id" v-model="votes"><span class="checkmark"></span></label>
                   </li>
                 </ul>
                 <ul class="vote-summary">
