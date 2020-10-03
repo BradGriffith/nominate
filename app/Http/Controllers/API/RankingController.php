@@ -69,7 +69,7 @@ class RankingController extends Controller
 
         //get the top $nominee_min_count nominees by number of votes
         $nominees = Nomination::withCount('votes')
-            ->where('position',$position_id)
+            ->where('position_id',$position_id)
             ->where('year', date('Y'))
             ->orderBy('votes_count','desc')
             ->limit($nominee_min_count)
@@ -80,7 +80,7 @@ class RankingController extends Controller
 
         // get all nominees with at least as many votes as the nominee in $nominee_min_count-th place
         $nominees_final = Nomination::withCount('votes')
-            ->where('position',$position_id)
+            ->where('position_id',$position_id)
             ->where('year', date('Y'))
             ->having('votes_count','>=', $min_votes)
             ->get();
