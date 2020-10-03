@@ -11,7 +11,7 @@
 
             <ol class="results">
                 <li v-for="nominee in nominees">
-                {{ nominee.name }}
+                {{ nominee.nomination.last_name }}, {{ nominee.nomination.first_name }}
                 </li>
             </ol>
         </div>

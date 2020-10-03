@@ -28516,7 +28516,13 @@ var render = function() {
           { staticClass: "results" },
           _vm._l(_vm.nominees, function(nominee) {
             return _c("li", [
-              _vm._v("\n            " + _vm._s(nominee.name) + "\n            ")
+              _vm._v(
+                "\n            " +
+                  _vm._s(nominee.nomination.last_name) +
+                  ", " +
+                  _vm._s(nominee.nomination.first_name) +
+                  "\n            "
+              )
             ])
           }),
           0
@@ -43617,8 +43623,8 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/brad/git/nominate/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Users/brad/git/nominate/resources/css/app.css */"./resources/css/app.css");
+__webpack_require__(/*! /home/brad/git/nominate/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /home/brad/git/nominate/resources/css/app.css */"./resources/css/app.css");
 
 
 /***/ })
