@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     $position_id = App\Models\Position::where('is_default',1)->first()->id;
+    return Inertia\Inertia::render('DashboardPage', compact(['position_id']));
+})->name('dashboard');
+
+Route::get('/vote', function () {
+    $position_id = App\Models\Position::where('is_default',1)->first()->id;
     return Inertia\Inertia::render('VotePage', compact(['position_id']));
 })->name('vote');
 

@@ -1,0 +1,98 @@
+<template>
+    <div>
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl mb-10 rounded-lg">
+            <div class="mt-8 text-2xl">
+                FCC Nominations Dashboard!
+            </div>
+
+            <div class="mt-6 text-gray-500">
+                Here you will find the current status of the nominating process.
+            </div>
+
+            <p>Current Position: {{ position.name }}</p>
+            <p>Current Status: {{ position.status }}</p>
+        </div>
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg">
+            <div class="text-xl">Voting</div>
+            <div v-if="position.status.length">
+                <ul>
+                    <li>Votes received from: {{ votersReceived.length }} / {{ voterNumbers.length }}</li>
+                    <li>Missing votes: {{ votersMissing.join(',') }}</li>
+                </ul>
+                <ul class="voter-check">
+                    <li v-for="voter in voterNumbers" :class="{ voted: voted(voter) }">{{ voter }}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg">
+            <div class="text-xl">Ranking</div>
+            <div v-if="position.status=='rank' || position.status=='results'">
+                <ul>
+                    <li>Rankings received from: {{ rankersReceived.length }} / {{ voterNumbers.length }}</li>
+                    <li>Missing rankings: {{ rankersMissing.join(', ') }}</li>
+                </ul>
+                <ul class="voter-check">
+                    <li v-for="voter in voterNumbers" :class="{ voted: ranked(voter) }">{{ voter }}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg">
+            <div class="text-xl">Results</div>
+            <p v-if="position.status=='results'">
+                <a href="/results">Results available! (click here)</a></li>
+            </p>
+            <p v-else>
+                Results pending completion of {{ position.status }}ing.
+            </p>
+        </div>
+    </div>
+</template>
+
+<script>
+    import axios from 'axios';
+
+    export default {
+        components: {
+        },
+        props: [
+          'position_id'
+        ],
+        data: function() {
+            return {
+              position: {
+                  name: 'Loading...',
+                  status: '',
+              },
+              voterNumbers: [],
+              votersReceived: [],
+              rankersReceived: []
+            };
+        },
+        computed: {
+          votersMissing: function() { return this.voterNumbers.filter(a => { return this.votersReceived.indexOf(a.toString()) == -1; }) },
+          rankersMissing: function() { return this.voterNumbers.filter(a => { return this.rankersReceived.indexOf(a.toString()) == -1; }) },
+        },
+        mounted () {
+          this.updateResults();
+          setInterval(this.updateResults, 5000);
+        },
+        methods: {
+          updateResults() {
+            axios
+                .get('/api/results')
+                .then(response => {
+                    this.voterNumbers = response.data.voterNumbers,
+                    this.position = response.data.position,
+                    this.votersReceived = response.data.votersReceived,
+                    this.rankersReceived = response.data.rankersReceived
+                });
+          },
+          voted(voter) {
+              return this.votersReceived.indexOf(voter.toString()) != -1;
+          },
+          ranked(voter) {
+              return this.rankersReceived.indexOf(voter.toString()) != -1;
+          }
+        }
+    }
+</script>

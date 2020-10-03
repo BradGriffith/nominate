@@ -14,7 +14,10 @@
 
                         <!-- Navigation Links -->
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <jet-nav-link href="/" :active="$page.currentRouteName == 'vote'">
+                            <jet-nav-link href="/" :active="$page.currentRouteName == 'dashboard'">
+                                Dashboard
+                            </jet-nav-link>
+                            <jet-nav-link href="/vote" :active="$page.currentRouteName == 'vote'">
                                 Vote
                             </jet-nav-link>
                             <jet-nav-link href="/rank" :active="$page.currentRouteName == 'rank'">

@@ -29,3 +29,5 @@ Route::get('voters/{position_id}', 'App\Http\Controllers\API\VoteController@getV
 Route::get('rankers/{position_id}', 'App\Http\Controllers\API\RankingController@getRankers');
 
 Route::get('ranks/nominees/{position_id}', 'App\Http\Controllers\API\RankingController@getNominees');
+
+Route::get('results', 'App\Http\Controllers\API\NominationController@getResults');
