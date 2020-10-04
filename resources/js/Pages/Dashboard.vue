@@ -17,7 +17,7 @@
 </template>
 
 <script>
-    import AppLayout from './../Layouts/AppLayoutNoAuth'
+    import AppLayout from './../Layouts/AppLayout'
     import Dashboard from './../Dashboard'
 
     export default {
