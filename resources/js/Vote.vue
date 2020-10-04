@@ -15,7 +15,7 @@
             <form v-if="!votesCast">
             	<fieldset>
                 <label for="voter">Select Your Voter Number:</label>
-                <select name="voter-number" v-model="voter">
+                <select name="voter-number" v-model="voter" v-if="voterNumbers">
                   <option value="">-- Select Your voter number --</option>
                   <option :value="voter" v-for="voter in voterNumbers">{{ voter }}</option>
                 </select>
