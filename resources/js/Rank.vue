@@ -6,7 +6,13 @@
             </div>
 
             <div class="mt-6 text-gray-500">
-                Now that all the votes are in, we have our top nominees. Next you will rank these nominees from the your first/top/lowest number pick to your last/bottom/highest number.
+                <p>Now that all the votes are in, we have our top nominees. Next you will rank these nominees from the your first/top/lowest number pick to your last/bottom/highest number.</p>
+                <p class="my-3">There are two different ways to make your rank selections:
+                  <ol class="ranked">
+                    <li>Make your selections from the select lists/dropdowns</li>
+                    <li>Click the names of the nominees in order from your top pick to last pick</li>
+                  </ol>
+                </p>
             </div>
 
             <div v-if="ranksCast">
@@ -27,8 +33,8 @@
                   <li v-for="nominee in nominees" class="w-1/2">
                     <select :id="'vote-' + nominee.id" v-model="ranks[nominee.id]">
                         <option vale=""></option>
-                        <option v-for="rank in rankingOptions" :value="rank">{{ rank }}</option>
-                    </select> {{ nominee.name }}
+                        <option v-for="rank in rankingOptionsLeft(nominee.id)" :value="rank">{{ rank }}</option>
+                    </select><span class="rank-nominee-name" @click="selectNextRank(nominee.id)">{{ nominee.name }}</span>
                   </li>
                 </ul>
                         </div>
@@ -36,7 +42,7 @@
 
                 Ranked Nominees:
                 <ol class="ranked">
-                  <li v-for="(nominee, i) in nominees">{{ getNomineeNameByRank(i+1) }}</li>
+                  <li v-for="(nominee, i) in nominees">{{ getNomineeByRank(i+1) }}</li>
                 </ol>
 
                 <ul class="rank-summary" style="display: none;">
@@ -101,30 +107,38 @@
               position_id: this.nominees[0].position_id,
             })
             .then(resp => {
-              console.log(resp);
               this.ranksCast = true;
             })
           },
           getNomineeByRank(i) {
-              var nominees = document.querySelectorAll('select option:checked[value="' + i + '"]');
-              var names = []
+            var nominee_id = this.ranks.indexOf(i);
+            if(nominee_id == -1) {
+              return '';
+            }
 
-              if(!nominees.length) {
-                  return [];
-              }
+            var nominee = this.nominees.find(n => { return n.id == nominee_id });
 
-              nominees.forEach(nominee => {
-                  var name = nominee.parentElement.nextSibling.textContent.trim();
-                  if(name.length) {
-                    names.push(name);
-                  }
-              });
-
-              return names;
+            return nominee.name;
           },
-          getNomineeNameByRank(i) {
-              var names = this.getNomineeByRank(i);
-              return names.join(' AND ')
+          rankingOptionsLeft: function(nominee_id) {
+            return this.rankingOptions.filter(o => { return this.ranks.indexOf(o) == -1 || [this.ranks[nominee_id],''].indexOf(o) != -1 });
+          },
+          getNextAvailableRank() {
+          },
+          selectNextRank(nominee_id) {
+            // Don't change the rank if one is already set
+            if(this.ranks[nominee_id]) {
+              return;
+            }
+
+            // get the next available option
+            var next_rank = this.rankingOptions.reduce((min, cur) => { return cur < min && this.ranks.indexOf(cur) == -1 ? cur : min },100);
+
+            // set the ranking
+            this.ranks[nominee_id] = next_rank;
+
+            // force UI update to fix select checked options
+            this.$forceUpdate();
           }
         }
     }
