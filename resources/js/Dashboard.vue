@@ -17,32 +17,27 @@
             <div v-if="position.status.length">
                 <ul>
                     <li>Votes received from: {{ votersReceived.length }} / {{ voterNumbers.length }}</li>
-                    <li>Missing votes: {{ votersMissing.join(',') }}</li>
+                    <li>Missing votes: {{ votersMissing.join(' &nbsp; ') }}</li>
                 </ul>
                 <ul class="voter-check">
                     <li v-for="voter in voterNumbers" :class="{ voted: voted(voter) }">{{ voter }}</li>
                 </ul>
             </div>
         </div>
-        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg">
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg" v-if="position.status=='rank' || position.status=='results'">
             <div class="text-xl">Ranking</div>
-            <div v-if="position.status=='rank' || position.status=='results'">
-                <ul>
-                    <li>Rankings received from: {{ rankersReceived.length }} / {{ voterNumbers.length }}</li>
-                    <li>Missing rankings: {{ rankersMissing.join(', ') }}</li>
-                </ul>
-                <ul class="voter-check">
-                    <li v-for="voter in voterNumbers" :class="{ voted: ranked(voter) }">{{ voter }}</li>
-                </ul>
-            </div>
+            <ul>
+                <li>Rankings received from: {{ rankersReceived.length }} / {{ voterNumbers.length }}</li>
+                <li>Missing rankings: {{ rankersMissing.join(' &nbps; ') }}</li>
+            </ul>
+            <ul class="voter-check">
+                <li v-for="voter in voterNumbers" :class="{ voted: ranked(voter) }">{{ voter }}</li>
+            </ul>
         </div>
-        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg">
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg" v-if="position.status=='results'">
             <div class="text-xl">Results</div>
-            <p v-if="position.status=='results'">
+            <p>
                 <a href="/results">Results available! (click here)</a></li>
-            </p>
-            <p v-else>
-                Results pending completion of {{ position.status }}ing.
             </p>
         </div>
     </div>
@@ -92,6 +87,20 @@
           },
           ranked(voter) {
               return this.rankersReceived.indexOf(voter.toString()) != -1;
+          },
+          updatePositionStatus(status) {
+            axios
+                .put('/api/positions/' + this.position.id, { status: status })
+                .then(response => {
+                    this.position = response.data;
+                })
+          },
+          updateDefaultPosition(new_position) {
+            axios
+                .put('/api/positions/default', { position_id: new_position })
+                .then(response => {
+                    this.updateResults();
+                })
           }
         }
     }

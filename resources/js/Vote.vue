@@ -5,6 +5,16 @@
                 Welcome to FCC Nominations!
             </div>
 
+          <div class="mt-6 text-gray-500" v-if="position.status == ''">
+            Loading...
+          </div>
+          <div class="mt-6 text-gray-500" v-else-if="position.status == 'rank'">
+            Voting is closed and ranking has started. <inertia-link href="/rank">If you haven't ranked nominees yet, click here to rank them now!</inertia-link>
+          </div>
+          <div class="mt-6 text-gray-500" v-else-if="position.status == 'results'">
+            <inertia-link href="/results">Results are ready! Click to view the results.</inertia-link>
+          </div>
+          <div v-else-if="position.status == 'vote'">
             <div class="mt-6 text-gray-500">
                 Here we will follow the 2-step process for selecting our nominees: vote then rank.
             </div>
@@ -52,8 +62,15 @@
     export default {
         components: {
         },
+        props: [
+          'position_id'
+        ],
         data: function() {
             return {
+              position: {
+                status: ''
+              },
+              updatePositionInterval: null,
               votesAllowed: 10,
               voterNumbers: [],
               votes: [],
@@ -72,12 +89,8 @@
           canSubmit () { return this.votes.length > 0 && this.votes.length <= this.votesAllowed; },
         },
         mounted () {
-          axios
-            .get('/api/positions/' + this.position_id)
-            .then(response => {
-              this.position = response.data;
-              this.votesAllowed = response.data.num_to_select;
-            });
+          this.updatePosition(this);
+          this.updatePositionInterval = setInterval(() => this.updatePosition(this), 5000);
           axios
             .get('/api/voters/' + this.position_id)
             .then(response => (this.voterNumbers = response.data));
@@ -85,7 +98,22 @@
             .get('/api/nominations?position_id=' + this.position_id)
             .then(response => (this.nominees = response.data));
         },
+        destroyed() {
+          clearInterval(this.updatePositionInterval);
+        },
         methods: {
+          updatePosition(vue) {
+            axios
+              .get('/api/positions/' + vue.position_id)
+              .then(response => {
+                vue.position = response.data;
+                vue.votesAllowed = response.data.num_to_select;
+
+                if(vue.position.status == 'rank') {
+                  this.$inertia.visit('/rank');
+                }
+              });
+          },
           postVotes() {
             axios.post('/api/votes', {
               voter: this.voter,
@@ -93,7 +121,6 @@
               position_id: this.nominees[0].position_id,
             })
             .then(resp => {
-              console.log(resp);
               this.votesCast = true;
             })
           }

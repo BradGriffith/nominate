@@ -5,6 +5,16 @@
                 Welcome to FCC Nominations!
             </div>
 
+            <div class="mt-6 text-gray-500" v-if="position.status == ''">
+              Loading...
+            </div>
+            <div class="mt-6 text-gray-500" v-else-if="position.status == 'vote'">
+              Voting is still in progress, so it's not time to rank yet. <inertia-link href="/vote">If you haven't voted, click here to vote now!</inertia-link>
+            </div>
+            <div class="mt-6 text-gray-500" v-else-if="position.status == 'results'">
+              <inertia-link href="/results">Results are ready! Click to view the results.</inertia-link>
+            </div>
+            <div v-else-if="position.status == 'rank'">
             <div class="mt-6 text-gray-500">
                 <p>Now that all the votes are in, we have our top nominees. Next you will rank these nominees from the your first/top/lowest number pick to your last/bottom/highest number.</p>
                 <p class="my-3">There are two different ways to make your rank selections:
@@ -63,6 +73,7 @@
               </fieldset>
             </form>
         </div>
+        </div>
     </div>
 </template>
 
@@ -73,14 +84,18 @@
         components: {
         },
         props: [
-          'position_id',
-          'voter'
+          'position_id'
         ],
         data: function() {
             return {
+              position: {
+                status: ''
+              },
+              updatePositionInterval: null,
               voterNumbers: [],
               ranks: [],
               ranksCast: false,
+              voter: 0,
               nominees: [
               ]
             };
@@ -92,6 +107,8 @@
           canSubmit () { this.ranks.filter(r => r === null).length == 0; },
         },
         mounted () {
+          this.updatePosition(this);
+          this.updatePositionInterval = setInterval(() => this.updatePosition(this), 5000);
           axios
             .get('/api/rankers/' + this.position_id)
             .then(response => (this.voterNumbers = response.data));
@@ -99,7 +116,21 @@
             .get('/api/ranks/nominees/' + this.position_id)
             .then(response => (this.nominees = response.data));
         },
+        destroyed() {
+          clearInterval(this.updatePositionInterval);
+        },
         methods: {
+          updatePosition(vue) {
+            axios
+              .get('/api/positions/' + vue.position_id)
+              .then(response => {
+                vue.position = response.data;
+
+                if(response.data.status == 'results') {
+                  vue.$inertia.visit('/results');
+                }
+              });
+          },
           postVotes() {
             axios.post('/api/ranks', {
               voter: this.voter,
