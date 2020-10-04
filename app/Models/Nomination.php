@@ -35,6 +35,7 @@ class Nomination extends Model
       $nominees = static::withCount('votes')
           ->where('position_id',$position_id)
           ->where('year', date('Y'))
+          ->having('votes_count', '>', 0)
           ->orderBy('votes_count','desc')
           ->limit($nominee_min_count)
           ->get();

@@ -90,8 +90,10 @@
           canSubmit () { return this.votes.length > 0 && this.votes.length <= this.votesAllowed; },
         },
         mounted () {
+          clearInterval(window.fccUpdateInterval);
           this.updatePosition(this);
-          this.updatePositionInterval = setInterval(() => this.updatePosition(this), 5000);
+          window.fccUpdateInterval = setInterval(() => this.updatePosition(this), 5000);
+
           axios
             .get('/api/voters/' + this.position_id)
             .then(response => (this.voterNumbers = response.data));

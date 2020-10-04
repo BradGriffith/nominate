@@ -48,8 +48,9 @@
             };
         },
         mounted () {
+          clearInterval(window.fccUpdateInterval);
           this.updatePosition(this);
-          this.updatePositionInterval = setInterval(() => this.updatePosition(this), 5000);
+          window.fccUpdateInterval = setInterval(() => this.updatePosition(this), 5000);
         },
         methods: {
           updatePosition(vue) {

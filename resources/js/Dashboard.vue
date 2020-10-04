@@ -39,7 +39,7 @@
             <div class="p-1"></div>
             <div class="text-l inline">Change Position: </div>
             <div class="inline-flex">
-                <button :class="['py-2 px-4 rounded-l',{'current text-gray-400': pos.id == position.id, 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold': pos.id != position.id}]" @click="updateDefaultPosition(pos.id)" v-for="pos in positions">
+                <button :class="['py-2 px-4 mx-2',{'current text-gray-400': pos.id == position.id, 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold': pos.id != position.id}]" @click="updateDefaultPosition(pos.id)" v-for="pos in positions">
                     {{ pos.name }}
                 </button>
             </div>
@@ -60,7 +60,7 @@
             <div class="text-xl">Ranking</div>
             <ul>
                 <li>Rankings received from: {{ rankersReceived.length }} / {{ voterNumbers.length }}</li>
-                <li>Missing rankings: {{ rankersMissing.join(' &nbps; ') }}</li>
+                <li>Missing rankings: {{ rankersMissing.join(' &nbsp; ') }}</li>
             </ul>
             <ul class="voter-check">
                 <li v-for="voter in voterNumbers" :class="{ voted: ranked(voter) }">{{ voter }}</li>
@@ -101,21 +101,23 @@
           rankersMissing: function() { return this.voterNumbers.filter(a => { return this.rankersReceived.indexOf(a.toString()) == -1; }) },
         },
         mounted () {
-          this.updateResults();
-          setInterval(this.updateResults, 5000);
+          clearInterval(window.fccUpdateInterval);
+          this.updateResults(this);
+          window.fccUpdateInterval = setInterval(() => this.updateResults(this), 5000);
+
           axios
             .get('/api/positions')
             .then(response => this.positions = response.data);
         },
         methods: {
-          updateResults() {
+          updateResults(vue) {
             axios
                 .get('/api/results')
                 .then(response => {
-                    this.voterNumbers = response.data.voterNumbers,
-                    this.position = response.data.position,
-                    this.votersReceived = response.data.votersReceived,
-                    this.rankersReceived = response.data.rankersReceived
+                    vue.voterNumbers = response.data.voterNumbers,
+                    vue.position = response.data.position,
+                    vue.votersReceived = response.data.votersReceived,
+                    vue.rankersReceived = response.data.rankersReceived
                 });
           },
           voted(voter) {

@@ -44,7 +44,7 @@
                     <select :id="'vote-' + nominee.id" v-model="ranks[nominee.id]">
                         <option vale=""></option>
                         <option v-for="rank in rankingOptionsLeft(nominee.id)" :value="rank">{{ rank }}</option>
-                    </select><span class="rank-nominee-name" @click="selectNextRank(nominee.id)">{{ nominee.name }}</span>
+                    </select><span class="rank-nominee-name ml-1" @click="selectNextRank(nominee.id)">{{ nominee.name }}</span>
                   </li>
                 </ul>
                         </div>
@@ -107,8 +107,9 @@
           canSubmit () { this.ranks.filter(r => r === null).length == 0; },
         },
         mounted () {
+          clearInterval(window.fccUpdateInterval);
           this.updatePosition(this);
-          this.updatePositionInterval = setInterval(() => this.updatePosition(this), 5000);
+          window.fccUpdateInterval = setInterval(() => this.updatePosition(this), 5000);
           axios
             .get('/api/rankers/' + this.position_id)
             .then(response => (this.voterNumbers = response.data));
@@ -132,9 +133,10 @@
               });
           },
           postVotes() {
+            var filtered_ranks = this.ranks.map((val, i) => (val == null ? null : {id:i,rank:val})).filter(val => val != null );
             axios.post('/api/ranks', {
               voter: this.voter,
-              ranks: this.ranks,
+              ranks: filtered_ranks,
               position_id: this.nominees[0].position_id,
             })
             .then(resp => {

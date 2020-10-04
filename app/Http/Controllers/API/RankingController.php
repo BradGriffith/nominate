@@ -36,10 +36,9 @@ class RankingController extends Controller
         // Check if votes have been submitted yet
 
         $ranks = [];
-        foreach($request->input('ranks') as $rank => $nomination_id) {
-            if(empty($nomination_id)) {
-                continue;
-            }
+        foreach($request->input('ranks') as $rank) {
+          $nomination_id = $rank['id'];
+          $rank = $rank['rank'];
 
           $ranks[] = compact([
             'voter',
