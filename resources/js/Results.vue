@@ -17,7 +17,7 @@
 
             <ol class="results">
                 <li v-for="nominee in nominees">
-                {{ nominee.nomination.last_name }}, {{ nominee.nomination.first_name }} ({{ nominee.sum }})
+                {{ nominee.nomination.last_name }}, {{ nominee.nomination.first_name }}<span v-if="$page.user"> ({{ nominee.sum }})</span>
                 </li>
             </ol>
             </div>
