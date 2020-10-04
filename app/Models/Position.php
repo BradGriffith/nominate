@@ -9,6 +9,12 @@ class Position extends Model
 {
     use HasFactory;
 
+    public $fillable = [
+        'name',
+        'is_default',
+        'status',
+    ];
+
     public static function getDefault() {
         return static::where('is_default', 1)->first();
     }

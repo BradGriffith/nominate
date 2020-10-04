@@ -38,7 +38,7 @@ class PositionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        return Position::find($id)->update(['status' => $request->get('status')]);
     }
 
     /**

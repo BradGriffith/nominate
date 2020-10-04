@@ -20,6 +20,7 @@ class PositionSeeder extends Seeder
             'num_to_select' => 15,
             'is_active' => 1,
             'is_default' => 1,
+            'status' => 'vote',
           ]
         );
         \App\Models\Position::firstOrCreate(
