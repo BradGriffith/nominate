@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::put('positions/default', 'App\Http\Controllers\API\PositionController@setDefault');
+
 Route::apiResources([
   'votes' => App\Http\Controllers\API\VoteController::class,
   'positions' => App\Http\Controllers\API\PositionController::class,

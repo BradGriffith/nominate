@@ -14,9 +14,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $position_id = App\Models\Position::where('is_default',1)->first()->id;
-    return Inertia\Inertia::render('DashboardPage', compact(['position_id']));
-})->name('dashboard');
+    return redirect('/vote');
+});
 
 Route::get('/vote', function () {
     $position_id = App\Models\Position::where('is_default',1)->first()->id;
@@ -35,5 +34,6 @@ Route::get('/results', function () {
 })->name('results');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return Inertia\Inertia::render('Dashboard');
+    $position_id = App\Models\Position::where('is_default',1)->first()->id;
+    return Inertia\Inertia::render('Dashboard', compact(['position_id']));
 })->name('dashboard');

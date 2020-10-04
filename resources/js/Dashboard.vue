@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl mb-10 rounded-lg">
+        <div class="pt-6 sm:px-20 bg-white rounded-t-lg">
             <div class="mt-8 text-2xl">
                 FCC Nominations Dashboard!
             </div>
@@ -11,6 +11,38 @@
 
             <p>Current Position: {{ position.name }}</p>
             <p>Current Status: {{ position.status }}</p>
+        </div>
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl mb-10 rounded-b-lg" v-if="$page.user">
+            <div class="text-xl">Admin Controls</div>
+            <div class="text-l inline clear">Change Status: </div>
+            <div class="inline-flex" v-if="position.status == 'vote'">
+                <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r" @click="updatePositionStatus('rank')">
+                    Start Ranking &raquo;
+                </button>
+            </div>
+            <div class="inline-flex" v-if="position.status == 'rank'">
+                <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l" @click="updatePositionStatus('vote')">
+                    &laquo; Re-open Voting
+                </button>
+                <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r  border-l border-gray-200" @click="updatePositionStatus('results')">
+                    Stop Ranking and Show Final Results &raquo;
+                </button>
+            </div>
+            <div class="inline-flex" v-if="position.status == 'results'">
+                <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l" @click="updatePositionStatus('vote')">
+                    &laquo; Re-open Voting
+                </button>
+                <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r  border-l border-gray-200" @click="updatePositionStatus('rank')">
+                    &laquo; Re-open Ranking
+                </button>
+            </div>
+            <div class="p-1"></div>
+            <div class="text-l inline">Change Position: </div>
+            <div class="inline-flex">
+                <button :class="['py-2 px-4 rounded-l',{'current text-gray-400': pos.id == position.id, 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold': pos.id != position.id}]" @click="updateDefaultPosition(pos.id)" v-for="pos in positions">
+                    {{ pos.name }}
+                </button>
+            </div>
         </div>
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg">
             <div class="text-xl">Voting</div>
@@ -54,6 +86,7 @@
         ],
         data: function() {
             return {
+              positions: [],
               position: {
                   name: 'Loading...',
                   status: '',
@@ -70,6 +103,9 @@
         mounted () {
           this.updateResults();
           setInterval(this.updateResults, 5000);
+          axios
+            .get('/api/positions')
+            .then(response => this.positions = response.data);
         },
         methods: {
           updateResults() {
