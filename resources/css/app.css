@@ -91,6 +91,28 @@ ol.results {
     bottom: 0;
 }
 
+ul.voter-check {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+ul.voter-check li {
+    background: #c00;
+    color: #fff;
+    width: 16.5%;
+    padding: 10px;
+    text-align: center;
+}
+
+ul.voter-check li.voted {
+    background: #cfc;
+    color: #000;
+}
+
+.rank-nominee-name {
+    cursor: pointer;
+}
+
 @media(min-width:481px) {
     .vote ul.nominees {
         column-count: 3;
