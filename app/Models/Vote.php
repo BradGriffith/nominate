@@ -9,24 +9,25 @@ class Vote extends Model
 {
     use HasFactory;
 
-    public static function getUnvotedVoters($position_id, $voter_count = null) {
-        if($voter_count === null) {
-            $voter_count = \Config::get('fcc.voter_count');
-        }
+    public static function getVotedVoters($position_id = null) {
+        $position_id = is_null($position_id) ? Position::getDefault()->id : $position_id;
 
-        $already_voted = Vote::where('position_id', $position_id)
+        $voter_count = \Config::get('fcc.voter_count');
+
+        return Vote::where('position_id', $position_id)
             ->where('year', date('Y'))
-            ->pluck('voter');
+            ->distinct()
+            ->pluck('voter')
+            ->toArray();
+    }
 
-        $voters = [];
-        for($i = 1;$i <= $voter_count;$i++) {
-            if(in_array($i, $already_voted->toArray())) {
-                continue;
-            };
+    public static function getUnvotedVoters($position_id = null) {
+        $position_id = is_null($position_id) ? Position::getDefault()->id : $position_id;
 
-            $voters[] = $i;
-        }
+        $voter_count = \Config::get('fcc.voter_count');
 
-        return $voters;
+        $already_voted = static::getVotedVoters();
+
+        return array_diff(range(1,$voter_count), $already_voted);
     }
 }

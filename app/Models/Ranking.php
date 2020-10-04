@@ -15,6 +15,28 @@ class Ranking extends Model
       return $this->belongsTo('App\Models\Nomination');
     }
 
+    public static function getRankedVoters($position_id = null) {
+        $position_id = is_null($position_id) ? Position::getDefault()->id : $position_id;
+
+        $ranker_count = \Config::get('fcc.voter_count');
+
+        return static::where('position_id', $position_id)
+            ->where('year', date('Y'))
+            ->distinct()
+            ->pluck('voter')
+            ->toArray();
+    }
+
+    public static function getUnrankedVoters($position_id = null) {
+        $position_id = is_null($position_id) ? Position::getDefault()->id : $position_id;
+
+        $ranker_count = \Config::get('fcc.voter_count');
+
+        $already_ranked = static::getRankedVoters();
+
+        return array_diff(range(1,$ranker_count), $already_ranked);
+    }
+
     public static function getWinners($position_id = null, $year = null) {
       if($position_id === null) {
         $position_id = Position::getDefault()->id;
