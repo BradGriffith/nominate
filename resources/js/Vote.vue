@@ -1,21 +1,17 @@
 <template>
     <div class="vote">
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
-            <div class="mt-8 text-2xl">
-                Welcome to FCC Nominations!
-            </div>
-
-          <div class="mt-6 text-gray-500" v-if="position.status == ''">
+          <div class="text-gray-500" v-if="position.status == ''">
             Loading...
           </div>
-          <div class="mt-6 text-gray-500" v-else-if="position.status == 'rank'">
+          <div class="text-gray-500" v-else-if="position.status == 'rank'">
             Voting is closed and ranking has started. <inertia-link href="/rank">If you haven't ranked nominees yet, click here to rank them now!</inertia-link>
           </div>
-          <div class="mt-6 text-gray-500" v-else-if="position.status == 'results'">
+          <div class="text-gray-500" v-else-if="position.status == 'results'">
             <inertia-link href="/results">Results are ready! Click to view the results.</inertia-link>
           </div>
           <div v-else-if="position.status == 'vote'">
-            <div class="mt-6 text-gray-500">
+            <div class="text-gray-500">
                 Here we will follow the 2-step process for selecting our nominees: vote then rank.
             </div>
 
@@ -39,7 +35,7 @@
                     </label>
                   </li>
                 </ul>
-                <ul class="vote-summary bg-gray-400 p-3">
+                <ul class="vote-summary bg-yellow-200 p-3">
                   <li>
                     <strong>{{ votes.length }}</strong> nominees selected
                   </li>

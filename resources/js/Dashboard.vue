@@ -1,18 +1,14 @@
 <template>
     <div>
-        <div class="pt-6 sm:px-20 bg-white rounded-t-lg">
-            <div class="mt-8 text-2xl">
-                FCC Nominations Dashboard!
-            </div>
-
-            <div class="mt-6 text-gray-500">
+        <div class="p-6 sm:px-20 bg-white rounded-t-lg">
+            <div class="text-gray-500">
                 Here you will find the current status of the nominating process.
             </div>
 
             <p>Current Position: {{ position.name }}</p>
             <p>Current Status: {{ position.status }}</p>
         </div>
-        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl mb-10 rounded-b-lg" v-if="$page.user">
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 border-t border-gray-200 shadow-xl mb-10 rounded-b-lg" v-if="$page.user">
             <div class="text-xl">Admin Controls</div>
             <div class="text-l inline clear">Change Status: </div>
             <div class="inline-flex" v-if="position.status == 'vote'">
