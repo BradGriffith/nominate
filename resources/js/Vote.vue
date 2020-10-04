@@ -22,7 +22,7 @@
             <div v-if="votesCast">
               Thank you for voting!
             </div>
-            <form v-if="!votesCast">
+            <div v-if="!votesCast">
             	<fieldset>
                 <label for="voter">Select Your Voter Number:</label>
                 <select name="voter-number" v-model="voter" v-if="voterNumbers">
@@ -51,7 +51,8 @@
                 <input type="submit" value="Vote" @click="postVotes" :disabled="!canSubmit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-2 rounded" />
                 </div>
               </fieldset>
-            </form>
+            </div>
+          </div>
         </div>
     </div>
 </template>
