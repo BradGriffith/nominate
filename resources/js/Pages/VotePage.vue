@@ -1,5 +1,5 @@
 <template>
-    <app-layout-no-auth>
+    <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                Vote
@@ -13,16 +13,16 @@
                 </div>
             </div>
         </div>
-    </app-layout-no-auth>
+    </app-layout>
 </template>
 
 <script>
-    import AppLayoutNoAuth from './../Layouts/AppLayoutNoAuth'
+    import AppLayout from './../Layouts/AppLayout'
     import Vote from './../Vote'
 
     export default {
         components: {
-            AppLayoutNoAuth,
+            AppLayout,
             Vote,
         },
     }
