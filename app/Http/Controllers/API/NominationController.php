@@ -5,6 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Nomination;
+use App\Models\Position;
+use App\Models\Ranking;
+use App\Models\Vote;
 
 class NominationController extends Controller
 {
@@ -16,6 +19,24 @@ class NominationController extends Controller
     public function index()
     {
         return Nomination::all();
+    }
+
+    public function getResults() {
+        $voterNumbers = range(1, \Config::get('fcc.voter_count'));
+        $position = Position::getDefault();
+        $votersReceived = Vote::getVotedVoters();
+        $rankersReceived = Ranking::getRankedVoters();
+        $votesCount = Vote::count();
+        $ranksCount = Ranking::count();
+
+        return compact([
+            'voterNumbers',
+            'position',
+            'votersReceived',
+            'rankersReceived',
+            'votesCount',
+            'ranksCount',
+        ]);
     }
 
     /**
