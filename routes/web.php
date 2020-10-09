@@ -37,3 +37,8 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     $position_id = App\Models\Position::where('is_default',1)->first()->id;
     return Inertia\Inertia::render('Dashboard', compact(['position_id']));
 })->name('dashboard');
+
+
+Route::group(['prefix' => 'admin'], function () {
+    Voyager::routes();
+});

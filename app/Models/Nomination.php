@@ -17,6 +17,10 @@ class Nomination extends Model
       'name',
     ];
 
+    public function scopeWinners($query) {
+      return Nomination::whereIn('id',array_keys(Ranking::getWinners()));
+    }
+
     public function votes() {
       return $this->hasMany('App\Models\Vote');
     }
