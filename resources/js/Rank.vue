@@ -25,8 +25,7 @@
               Thank you for ranking!
             </div>
 
-            <form v-if="!ranksCast">
-            	<fieldset>
+              <fieldset v-if="!ranksCast">
                 <label for="voter">Select Your Voter Number:</label>
                 <div class="inline-block relative w-20">
                   <select name="voter-number" v-model="voter" v-if="voterNumbers" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
@@ -77,7 +76,6 @@
                 </div>
                 </div>
               </fieldset>
-            </form>
         </div>
         </div>
     </div>

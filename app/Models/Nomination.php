@@ -29,7 +29,7 @@ class Nomination extends Model
       return $this->hasMany('App\Models\Ranking');
     }
 
-    public static function getNomineesForRanking($position_id = null)
+    public static function getNomineesForRanking($position_id = null, $orderByCount = false)
     {
       $position_id = is_null($position_id) ? Position::getDefault()->id : $position_id;
 
@@ -52,10 +52,15 @@ class Nomination extends Model
       $min_votes = $nominees[min(count($nominees), $nominee_min_count)-1]->votes_count;
 
       // get all nominees with at least as many votes as the nominee in $nominee_min_count-th place
-      return static::withCount('votes')
+      $nominees_for_ranking = static::withCount('votes')
           ->where('position_id',$position_id)
           ->where('year', date('Y'))
-          ->having('votes_count','>=', $min_votes)
-          ->get();
+          ->having('votes_count','>=', $min_votes);
+
+      if($orderByCount) {
+        $nominees_for_ranking->orderBy('votes_count','desc');
+      }
+
+      return $nominees_for_ranking->get();
     }
 }

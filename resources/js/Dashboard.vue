@@ -50,6 +50,10 @@
                 <ul class="voter-check">
                     <li v-for="voter in voterNumbers" :class="{ voted: voted(voter) }">{{ voter }}</li>
                 </ul>
+                <p class="font-bold pt-6">Nominees for ranking:</p>
+                <ol class="results">
+                    <li v-for="nominee in nomineesForRanking">{{ nominee.name }} ({{ nominee.votes_count}} vote{{ nominee.votes_count != 1 ? 's' : '' }})</li>
+                </ol>
             </div>
         </div>
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg" v-if="position.status=='rank' || position.status=='results'">
@@ -87,6 +91,7 @@
                   name: 'Loading...',
                   status: '',
               },
+              nomineesForRanking: [],
               voterNumbers: [],
               votersReceived: [],
               rankersReceived: []
@@ -101,10 +106,10 @@
             this.voterNumbers = e.voterNumbers,
             this.position = e.position,
             this.votersReceived = e.votersReceived,
-            this.rankersReceived = e.rankersReceived
+            this.rankersReceived = e.rankersReceived,
+            this.rankersReceived = e.nomineesForRanking
           });
           this.updateResults();
-
           axios
             .get('/api/positions')
             .then(response => this.positions = response.data);
@@ -117,7 +122,8 @@
                     this.voterNumbers = response.data.voterNumbers,
                     this.position = response.data.position,
                     this.votersReceived = response.data.votersReceived,
-                    this.rankersReceived = response.data.rankersReceived
+                    this.rankersReceived = response.data.rankersReceived,
+                    this.nomineesForRanking = response.data.nomineesForRanking
                 });
           },
           voted(voter) {

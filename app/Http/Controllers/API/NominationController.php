@@ -28,6 +28,7 @@ class NominationController extends Controller
         $position = Position::getDefault();
         $votersReceived = Vote::getVotedVoters();
         $rankersReceived = Ranking::getRankedVoters();
+        $nomineesForRanking = Nomination::getNomineesForRanking(null,true);
         $votesCount = Vote::count();
         $ranksCount = Ranking::count();
 
@@ -36,6 +37,7 @@ class NominationController extends Controller
             'position',
             'votersReceived',
             'rankersReceived',
+            'nomineesForRanking',
             'votesCount',
             'ranksCount',
         ]);

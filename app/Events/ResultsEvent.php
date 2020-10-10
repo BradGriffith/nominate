@@ -23,6 +23,7 @@ class ResultsEvent implements ShouldBroadcast
     public $position;
     public $votersReceived;
     public $rankersReceived;
+    public $nomineesForRanking;
     public $votesCount;
     public $rankscount;
 
@@ -37,6 +38,7 @@ class ResultsEvent implements ShouldBroadcast
         $this->position = Position::getDefault();
         $this->votersReceived = Vote::getVotedVoters();
         $this->rankersReceived = Ranking::getRankedVoters();
+        $this->nomineesForRanking = Nomination::getNomineesForRanking(null, true);
         $this->votesCount = Vote::count();
         $this->ranksCount = Ranking::count();
     }
