@@ -45,16 +45,10 @@
         mounted () {
           window.Echo.channel("results-channel").listen(".results-updated", e => {
             this.position = e.position;
-            this.navigateAway();
           });
           this.updatePosition();
         },
         methods: {
-          navigateAway() {
-            if(this.position.status != 'results') {
-              this.$inertia.visit('/' + this.position.status);
-            }
-          },
           updatePosition() {
             axios
               .get('/api/positions/' + this.position_id)
