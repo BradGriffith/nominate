@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\Resultsevent;
 use App\Http\Controllers\Controller;
 use App\Models\Vote;
 use Illuminate\Http\Request;
@@ -42,7 +43,9 @@ class VoteController extends Controller
           ]);
         }
 
-        return Vote::insert($votes);
+        $inserted = Vote::insert($votes);
+        event(new ResultsEvent());
+        return $inserted;
     }
 
     public function getVoters($position_id) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\Resultsevent;
 use App\Http\Controllers\Controller;
 use App\Models\Nomination;
 use App\Models\Position;
@@ -49,7 +50,9 @@ class RankingController extends Controller
           ]);
         }
 
-        return Ranking::insert($ranks);
+        $inserted = Ranking::insert($ranks);
+        event(new ResultsEvent());
+        return $inserted;
     }
 
     /**
