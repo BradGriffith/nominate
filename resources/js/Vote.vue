@@ -55,6 +55,9 @@
 
 <script>
     import axios from 'axios';
+    import Vue from 'vue';
+    import VueCookies from 'vue-cookies';
+    Vue.use(VueCookies);
 
     export default {
         components: {
@@ -81,6 +84,11 @@
         props: [
           'position_id'
         ],
+        watch: {
+          voter: function(newVoter, oldVoter) {
+            this.$cookies.set('voter',newVoter);
+          },
+        },
         computed: {
           votesRemaining: function() { return this.votesAllowed - this.votes.length; },
           canSubmit () { return this.votes.length > 0 && this.votes.length <= this.votesAllowed; },
@@ -92,7 +100,10 @@
 
           axios
             .get('/api/voters/' + this.position_id)
-            .then(response => (this.voterNumbers = response.data));
+            .then(response => {
+              this.voterNumbers = response.data;
+              this.getSavedVoter();
+            });
           axios
             .get('/api/nominations?position_id=' + this.position_id)
             .then(response => (this.nominees = response.data));
@@ -101,6 +112,12 @@
           clearInterval(this.updatePositionInterval);
         },
         methods: {
+          getSavedVoter() {
+            var voter_cookie = this.$cookies.get('voter');
+            if(this.voter === 0 && voter_cookie) {
+              this.voter = voter_cookie;
+            }
+          },
           updatePosition(vue) {
             axios
               .get('/api/positions/' + vue.position_id)
