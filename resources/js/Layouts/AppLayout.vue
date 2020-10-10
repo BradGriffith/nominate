@@ -26,6 +26,9 @@
                             <jet-nav-link href="/results" :active="$page.currentRouteName == 'results'">
                                 Results
                             </jet-nav-link>
+                            <jet-nav-link href="/admin">
+                                Admin
+                            </jet-nav-link>
                         </div>
                     </div>
 
