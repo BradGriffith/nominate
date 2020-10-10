@@ -17,8 +17,8 @@ class Nomination extends Model
       'name',
     ];
 
-    public function scopeWinners($query, $position_id = null) {
-      return Nomination::whereIn('id',array_keys(Ranking::getWinners($position_id)));
+    public function scopeWinners($query, $position_id = null, $year = null) {
+      return Nomination::whereIn('id',Ranking::getWinners($position_id, $year)->pluck('nomination_id'));
     }
 
     public function votes() {
