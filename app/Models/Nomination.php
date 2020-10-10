@@ -44,6 +44,10 @@ class Nomination extends Model
           ->limit($nominee_min_count)
           ->get();
 
+      if(count($nominees) == 0) {
+        return [];
+      }
+
       // find the minimum number of votes you'd have to get to tie for last place
       $min_votes = $nominees[min(count($nominees), $nominee_min_count)-1]->votes_count;
 
