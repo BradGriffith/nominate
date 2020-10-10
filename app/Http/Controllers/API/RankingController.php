@@ -37,6 +37,7 @@ class RankingController extends Controller
         // Check if votes have been submitted yet
 
         $ranks = [];
+        $created_at = date('Y-m-d H:i:s');
         foreach($request->input('ranks') as $rank) {
           $nomination_id = $rank['id'];
           $rank = $rank['rank'];
@@ -47,6 +48,7 @@ class RankingController extends Controller
             'nomination_id',
             'year',
             'rank',
+            'created_at',
           ]);
         }
 

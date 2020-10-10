@@ -34,12 +34,14 @@ class VoteController extends Controller
         // Check if votes have been submitted yet
 
         $votes = [];
+        $created_at = date('Y-m-d H:i:s');
         foreach($request->input('votes') as $nomination_id) {
           $votes[] = compact([
             'voter',
             'position_id',
             'nomination_id',
             'year',
+            'created_at',
           ]);
         }
 
