@@ -16,9 +16,11 @@ class NominationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Nomination::all();
+        return Nomination::where('position_id', $request->get('position_id'))
+          ->where('year', date('Y'))
+          ->get();
     }
 
     public function getResults() {
