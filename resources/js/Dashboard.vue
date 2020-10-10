@@ -104,11 +104,12 @@
         },
         mounted () {
           window.Echo.channel("results-channel").listen(".results-updated", e => {
+            console.log({results: e});
             this.voterNumbers = e.voterNumbers,
             this.position = e.position,
             this.votersReceived = e.votersReceived,
             this.rankersReceived = e.rankersReceived,
-            this.nomineesForRanking = e.nomineesForRanking
+            this.nomineesForRanking = JSON.parse(e.nomineesForRanking)
           });
           this.updateResults();
           axios

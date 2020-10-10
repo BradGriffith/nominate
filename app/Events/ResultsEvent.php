@@ -38,7 +38,8 @@ class ResultsEvent implements ShouldBroadcast
         $this->position = Position::getDefault();
         $this->votersReceived = Vote::getVotedVoters();
         $this->rankersReceived = Ranking::getRankedVoters();
-        $this->nomineesForRanking = Nomination::getNomineesForRanking(null, true);
+        // json_encode hack was needed due to votes_count not coming through in the broadcast message
+        $this->nomineesForRanking = json_encode(Nomination::getNomineesForRanking(null, true));
         $this->votesCount = Vote::count();
         $this->ranksCount = Ranking::count();
     }
