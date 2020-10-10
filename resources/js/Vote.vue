@@ -12,7 +12,7 @@
           </div>
           <div v-else-if="position.status == 'vote'">
             <div class="text-gray-500">
-                Select {{ votesAllowed }} {{ position.name }} nominees below to start the process.
+                Select {{ position.num_to_select }} {{ position.name }} nominees below to start the process.
             </div>
 
             <div v-if="votesCast">
@@ -74,9 +74,9 @@
         data: function() {
             return {
               position: {
-                status: ''
+                status: '',
+                num_to_select: 1
               },
-              votesAllowed: 10,
               voterNumbers: [],
               votes: [],
               voter: 0,
@@ -99,8 +99,8 @@
           },
         },
         computed: {
-          votesRemaining: function() { return this.votesAllowed - this.votes.length; },
-          canSubmit () { return this.votes.length > 0 && this.votes.length <= this.votesAllowed; },
+          votesRemaining: function() { return this.position.num_to_select - this.votes.length; },
+          canSubmit () { return this.votes.length > 0 && this.votes.length <= this.position.num_to_select; },
         },
         mounted () {
           window.Echo.channel("position-channel").listen(".position-updated", e => {
