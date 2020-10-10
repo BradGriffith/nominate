@@ -71,7 +71,7 @@
 }
 
 ul.nominees {
-    column-count: 2;
+    column-count: 1;
     padding: 20px 0;
 }
 
@@ -114,6 +114,12 @@ ul.voter-check li.voted {
 }
 
 @media(min-width:481px) {
+    .vote ul.nominees {
+        column-count: 2;
+    }
+}
+
+@media(min-width:761px) {
     .vote ul.nominees {
         column-count: 3;
     }
