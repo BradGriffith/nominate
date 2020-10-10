@@ -97,23 +97,27 @@
           rankersMissing: function() { return this.voterNumbers.filter(a => { return this.rankersReceived.indexOf(a.toString()) == -1; }) },
         },
         mounted () {
-          clearInterval(window.fccUpdateInterval);
-          this.updateResults(this);
-          window.fccUpdateInterval = setInterval(() => this.updateResults(this), 5000);
+          window.Echo.channel("results-channel").listen(".results-updated", e => {
+            this.voterNumbers = e.voterNumbers,
+            this.position = e.position,
+            this.votersReceived = e.votersReceived,
+            this.rankersReceived = e.rankersReceived
+          });
+          this.updateResults();
 
           axios
             .get('/api/positions')
             .then(response => this.positions = response.data);
         },
         methods: {
-          updateResults(vue) {
+          updateResults() {
             axios
                 .get('/api/results')
                 .then(response => {
-                    vue.voterNumbers = response.data.voterNumbers,
-                    vue.position = response.data.position,
-                    vue.votersReceived = response.data.votersReceived,
-                    vue.rankersReceived = response.data.rankersReceived
+                    this.voterNumbers = response.data.voterNumbers,
+                    this.position = response.data.position,
+                    this.votersReceived = response.data.votersReceived,
+                    this.rankersReceived = response.data.rankersReceived
                 });
           },
           voted(voter) {
@@ -125,16 +129,10 @@
           updatePositionStatus(status) {
             axios
                 .put('/api/positions/' + this.position.id, { status: status })
-                .then(response => {
-                    this.position = response.data;
-                })
           },
           updateDefaultPosition(new_position) {
             axios
                 .put('/api/positions/default', { position_id: new_position })
-                .then(response => {
-                    this.updateResults();
-                })
           }
         }
     }

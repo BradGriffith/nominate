@@ -47,7 +47,7 @@ class PositionController extends Controller
     {
         $new_position_id = $request->get('position_id');
         Position::where('id', '!=', $new_position_id)->update(['is_default' => false, 'status' => 'vote']);
-        Position::where('id', $new_position_id)->update(['is_default' => true, 'status' => 'vote']);
+        Position::find($new_position_id)->update(['is_default' => true, 'status' => 'vote']);
         return Position::getDefault();
     }
 

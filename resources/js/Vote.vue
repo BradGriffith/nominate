@@ -76,7 +76,6 @@
               position: {
                 status: ''
               },
-              updatePositionInterval: null,
               votesAllowed: 10,
               voterNumbers: [],
               votes: [],
@@ -100,9 +99,11 @@
           canSubmit () { return this.votes.length > 0 && this.votes.length <= this.votesAllowed; },
         },
         mounted () {
-          clearInterval(window.fccUpdateInterval);
-          this.updatePosition(this);
-          window.fccUpdateInterval = setInterval(() => this.updatePosition(this), 5000);
+          window.Echo.channel("position-channel").listen(".position-updated", e => {
+            this.position = e.position;
+            this.navigateAway();
+          });
+          this.updatePosition();
 
           axios
             .get('/api/voters/' + this.position_id)
@@ -114,9 +115,6 @@
             .get('/api/nominations?position_id=' + this.position_id)
             .then(response => (this.nominees = response.data));
         },
-        destroyed() {
-          clearInterval(this.updatePositionInterval);
-        },
         methods: {
           getSavedVoter() {
             var voter_cookie = this.$cookies.get('voter');
@@ -124,16 +122,17 @@
               this.voter = voter_cookie;
             }
           },
-          updatePosition(vue) {
+          navigateAway() {
+            if(this.position.status != 'vote') {
+              this.$inertia.visit('/' + this.position.status);
+            }
+          },
+          updatePosition() {
             axios
-              .get('/api/positions/' + vue.position_id)
+              .get('/api/positions/' + this.position_id)
               .then(response => {
-                vue.position = response.data;
-                vue.votesAllowed = response.data.num_to_select;
-
-                if(vue.position.status == 'rank') {
-                  this.$inertia.visit('/rank');
-                }
+                this.position = response.data;
+                this.navigateAway();
               });
           },
           postVotes() {

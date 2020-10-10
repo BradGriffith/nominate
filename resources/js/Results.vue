@@ -40,20 +40,27 @@
               position: {
                 status: ''
               },
-              updatePositionInterval: null
             };
         },
         mounted () {
-          clearInterval(window.fccUpdateInterval);
-          this.updatePosition(this);
-          window.fccUpdateInterval = setInterval(() => this.updatePosition(this), 5000);
+          window.Echo.channel("results-channel").listen(".results-updated", e => {
+            this.position = e.position;
+            this.navigateAway();
+          });
+          this.updatePosition();
         },
         methods: {
-          updatePosition(vue) {
+          navigateAway() {
+            if(this.position.status != 'results') {
+              this.$inertia.visit('/' + this.position.status);
+            }
+          },
+          updatePosition() {
             axios
-              .get('/api/positions/' + vue.position_id)
+              .get('/api/positions/' + this.position_id)
               .then(response => {
-                vue.position = response.data;
+                this.position = response.data;
+                this.navigateAway();
               });
           },
         }

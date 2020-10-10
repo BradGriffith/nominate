@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\ResultsEvent;
 use App\Models\Position;
 use App\Models\Nomination;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -53,5 +54,13 @@ class Ranking extends Model
           ->get();
 
       return $winners;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::saved(function ($model) {
+            event(new ResultsEvent());
+        });
     }
 }

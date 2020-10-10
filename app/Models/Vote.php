@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\ResultsEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -29,5 +30,13 @@ class Vote extends Model
         $already_voted = static::getVotedVoters();
 
         return array_diff(range(1,$voter_count), $already_voted);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::saved(function ($model) {
+            event(new ResultsEvent());
+        });
     }
 }

@@ -95,7 +95,6 @@
               position: {
                 status: ''
               },
-              updatePositionInterval: null,
               voterNumbers: [],
               ranks: [],
               ranksCast: false,
@@ -116,9 +115,12 @@
           canSubmit () { this.ranks.filter(r => r === null).length == 0; },
         },
         mounted () {
-          clearInterval(window.fccUpdateInterval);
-          this.updatePosition(this);
-          window.fccUpdateInterval = setInterval(() => this.updatePosition(this), 5000);
+          window.Echo.channel("position-channel").listen(".position-updated", e => {
+            this.position = e.position;
+            this.navigateAway();
+          });
+          this.updatePosition();
+
           axios
             .get('/api/rankers/' + this.position_id)
             .then(response => {
@@ -128,9 +130,6 @@
           axios
             .get('/api/ranks/nominees/' + this.position_id)
             .then(response => (this.nominees = response.data));
-        },
-        destroyed() {
-          clearInterval(this.updatePositionInterval);
         },
         methods: {
           getSavedVoter() {
@@ -142,16 +141,18 @@
           setSavedVoter(newVoter, oldVoter) {
             this.$root.voter = newVoter;
           },
-          updatePosition(vue) {
+          updatePosition() {
             axios
-              .get('/api/positions/' + vue.position_id)
+              .get('/api/positions/' + this.position_id)
               .then(response => {
-                vue.position = response.data;
-
-                if(response.data.status == 'results') {
-                  vue.$inertia.visit('/results');
-                }
+                this.position = response.data;
+                this.navigateAway();
               });
+          },
+          navigateAway() {
+            if(this.position.status != 'rank') {
+              this.$inertia.visit('/' + this.position.status);
+            }
           },
           postVotes() {
             var filtered_ranks = this.ranks.map((val, i) => (val == null ? null : {id:i,rank:val})).filter(val => val != null );
