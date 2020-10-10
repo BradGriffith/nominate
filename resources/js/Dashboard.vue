@@ -51,6 +51,7 @@
                     <li v-for="voter in voterNumbers" :class="{ voted: voted(voter) }">{{ voter }}</li>
                 </ul>
                 <p class="font-bold pt-6">Nominees for ranking:</p>
+                <p class="font-italic pb-2 italic" v-if="nomineesForRanking.length > position.num_to_select">There was a tie for #{{ position.num_to_select }} so we will rank {{ nomineesForRanking.length }} nominees.</p>
                 <ol class="results">
                     <li v-for="nominee in nomineesForRanking">{{ nominee.name }} ({{ nominee.votes_count}} vote{{ nominee.votes_count != 1 ? 's' : '' }})</li>
                 </ol>
@@ -107,7 +108,7 @@
             this.position = e.position,
             this.votersReceived = e.votersReceived,
             this.rankersReceived = e.rankersReceived,
-            this.rankersReceived = e.nomineesForRanking
+            this.nomineesForRanking = e.nomineesForRanking
           });
           this.updateResults();
           axios
