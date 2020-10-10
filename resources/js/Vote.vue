@@ -91,7 +91,11 @@
         ],
         watch: {
           voter: function(newVoter, oldVoter) {
+            if(!newVoter || newVoter == 'undefined') {
+              return;
+            }
             this.$cookies.set('voter',newVoter);
+            this.$root.voter = newVoter;
           },
         },
         computed: {
@@ -118,8 +122,8 @@
         methods: {
           getSavedVoter() {
             var voter_cookie = this.$cookies.get('voter');
-            if(this.voter === 0 && voter_cookie) {
-              this.voter = voter_cookie;
+            if(this.voter === 0 && (voter_cookie || this.$root.voter)) {
+              this.voter = voter_cookie || this.$root.voter;
             }
           },
           navigateAway() {
