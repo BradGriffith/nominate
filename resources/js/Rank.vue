@@ -27,12 +27,17 @@
 
             <form v-if="!ranksCast">
             	<fieldset>
-                    <label for="voter">Select Your Voter Number:</label>
-                    <select name="voter-number" v-model="voter" v-if="voterNumbers">
-                        <option value="">-- Select Your voter number --</option>
-                        <option :value="voter_num" v-for="voter_num in voterNumbers">{{ voter_num }}</option>
-                    </select>
-                    <div>
+                <label for="voter">Select Your Voter Number:</label>
+                <div class="inline-block relative w-20">
+                  <select name="voter-number" v-model="voter" v-if="voterNumbers" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="">-- Select Your voter number --</option>
+                    <option :value="voter" v-for="voter in voterNumbers">{{ voter }}</option>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                  </div>
+                </div>
+                <div>
                 <div v-if="voter" class="md:flex md:flex-wrap">
                         <div class="flex-1 bg-gray-100 rounded-lg p-2 m-2">
                 <ul class="nominees rankings flex flex-wrap">

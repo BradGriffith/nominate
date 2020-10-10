@@ -5,26 +5,32 @@
             Loading...
           </div>
           <div class="text-gray-500" v-else-if="position.status == 'rank'">
-            Voting is closed and ranking has started. <inertia-link href="/rank">If you haven't ranked nominees yet, click here to rank them now!</inertia-link>
+            {{ position.name }} voting is closed and ranking has started. <inertia-link href="/rank">If you haven't ranked nominees yet, click here to rank them now!</inertia-link>
           </div>
           <div class="text-gray-500" v-else-if="position.status == 'results'">
-            <inertia-link href="/results">Results are ready! Click to view the results.</inertia-link>
+            <inertia-link href="/results">{{ position.name }} results are ready! Click to view the results.</inertia-link>
           </div>
           <div v-else-if="position.status == 'vote'">
             <div class="text-gray-500">
-                Here we will follow the 2-step process for selecting our nominees: vote then rank.
+                Select {{ votesAllowed }} {{ position.name }} nominees below to start the process.
             </div>
 
             <div v-if="votesCast">
-              Thank you for voting!
+              Thank you for voting for {{ position.name }}!
             </div>
             <div v-if="!votesCast">
             	<fieldset>
                 <label for="voter">Select Your Voter Number:</label>
-                <select name="voter-number" v-model="voter" v-if="voterNumbers">
-                  <option value="">-- Select Your voter number --</option>
-                  <option :value="voter" v-for="voter in voterNumbers">{{ voter }}</option>
-                </select>
+
+                <div class="inline-block relative w-20">
+                  <select name="voter-number" v-model="voter" v-if="voterNumbers" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="">-- Select Your voter number --</option>
+                    <option :value="voter" v-for="voter in voterNumbers">{{ voter }}</option>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                  </div>
+                </div>
                 <div v-if="voter">
                 <ul class="nominees">
                   <li v-for="nominee in nominees">
