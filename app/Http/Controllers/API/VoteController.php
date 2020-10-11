@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Events\Resultsevent;
+use App\Events\ResultsEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Vote;
 use Illuminate\Http\Request;
