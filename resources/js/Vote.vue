@@ -1,6 +1,6 @@
 <template>
     <div class="vote">
-        <div class="p-3 sm:px-10 bg-white border-t border-gray-200 fixed bottom-0 left-0 w-full italic bg-yellow-200" v-if="position.status == 'vote'">
+        <div class="p-3 sm:px-10 bg-white border-t border-gray-200 fixed bottom-0 left-0 w-full italic bg-yellow-200 z-50" v-if="position.status == 'vote'">
           <p class="text-red italic">Voting is in progress. When everyone is done voting, change the current status on the Dashboard page to Ranking.</p>
         </div>
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200">

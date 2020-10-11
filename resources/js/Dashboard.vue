@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="p-3 sm:px-10 bg-white border-t border-gray-200 fixed bottom-0 left-0 w-full italic bg-yellow-200">
+        <div class="p-3 sm:px-10 bg-white border-t border-gray-200 fixed bottom-0 left-0 w-full italic bg-yellow-200 z-50">
           <p v-if="position.status == 'vote'">Voting is in progress. When everyone is done voting, click "Start Ranking &raquo;" above.</p>
           <p v-if="position.status == 'rank'">Ranking is in progress. When everyone is done ranking, click "Stop Ranking and Show Final Results &raquo;" above.</p>
           <p v-if="position.status == 'results'">Results are complete. To start voting on a different position, click the name of the position above.</p>
