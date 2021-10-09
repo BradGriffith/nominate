@@ -83,8 +83,20 @@ class VoteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $position_id, $voter)
     {
-        //
+        $year = date('Y');
+
+        $query = Vote::where('position_id',$position_id)
+                ->where('year',$year);
+
+        if($voter != 'all') {
+                $query->where('voter',$voter);
+        }
+
+        $result = $query->delete();
+        event(new ResultsEvent());
+
+        return $result;
     }
 }

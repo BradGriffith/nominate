@@ -39,7 +39,16 @@ class PositionController extends Controller
     public function update(Request $request, $id)
     {
         $position = Position::find($id);
-        $position->update(['status' => $request->get('status')]);
+        $status = $request->get('status');
+        $num_to_select = $request->get('num_to_select');
+
+        if($status) {
+                $position->status = $status;
+        }
+        if($num_to_select) {
+                $position->num_to_select = $num_to_select;
+        }
+        $position->save();
         return $position;
     }
 

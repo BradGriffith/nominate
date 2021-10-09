@@ -33,3 +33,6 @@ Route::get('rankers/{position_id}', 'App\Http\Controllers\API\RankingController@
 Route::get('ranks/nominees/{position_id}', 'App\Http\Controllers\API\RankingController@getNominees');
 
 Route::get('results', 'App\Http\Controllers\API\NominationController@getResults');
+
+Route::delete('votes/{position_id}/{voter}', 'App\Http\Controllers\API\VoteController@destroy');
+Route::delete('ranks/{position_id}/{ranker}', 'App\Http\Controllers\API\RankingController@destroy');

@@ -44,6 +44,42 @@
                     {{ pos.name }}
                 </button>
             </div>
+            <div class="p-1"></div>
+            <div class="text-l inline">Change Allowed Votes/Ranks Per Person: </div>
+            <div class="inline-flex">
+		<select v-model="position.num_to_select">
+		    <option v-for="i in 20">{{ i }}</option>
+		</select>
+		<button class="py-2 px-4 mx-2 bg-orange-400 hover:bg-orange-600 text-gray-200 font-bold" @click="updatePositionVoteCount">
+		    Change {{ position.name }} Votes/Ranks Allowed
+		</button>
+            </div>
+            <div v-if="votersReceived.length">
+		    <div class="p-1"></div>
+		    <div class="text-l inline">Clear Votes: </div>
+		    <div class="inline-flex">
+			<select v-model="clearVoterId">
+			    <option value="all">All</option>
+			    <option v-for="voter in votersReceived">{{ voter }}</option>
+			</select>
+			<button class="py-2 px-4 mx-2 bg-red-700 hover:bg-red-400 text-gray-200 font-bold" @click="clearVotes">
+			    Clear {{ position.name }} Votes
+			</button>
+		    </div>
+	    </div>
+            <div v-if="rankersReceived.length">
+		    <div class="p-1"></div>
+		    <div class="text-l inline">Clear Ranks: </div>
+		    <div class="inline-flex">
+			<select v-model="clearRankerId">
+			    <option value="all">All</option>
+			    <option v-for="ranker in rankersReceived">{{ ranker }}</option>
+			</select>
+			<button class="py-2 px-4 mx-2 bg-red-700 hover:bg-red-400 text-gray-200 font-bold" @click="clearRanks">
+			    Clear {{ position.name }} Ranks
+			</button>
+		    </div>
+	    </div>
         </div>
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg">
             <div class="text-xl">Voting</div>
@@ -100,7 +136,9 @@
               nomineesForRanking: [],
               voterNumbers: [],
               votersReceived: [],
-              rankersReceived: []
+              rankersReceived: [],
+              clearVoterId: 0,
+              clearRankerId: 0,
             };
         },
         computed: {
@@ -141,12 +179,24 @@
           },
           updatePositionStatus(status) {
             axios
-                .put('/api/positions/' + this.position.id, { status: status })
+                .put('/api/positions/' + this.position.id, { status: status });
+          },
+          updatePositionVoteCount() {
+            axios
+                .put('/api/positions/' + this.position.id, { num_to_select: this.position.num_to_select});
           },
           updateDefaultPosition(new_position) {
             axios
-                .put('/api/positions/default', { position_id: new_position })
-          }
+                .put('/api/positions/default', { position_id: new_position });
+          },
+          clearVotes() {
+            axios
+                .delete('/api/votes/' + this.position.id + '/' + this.clearVoterId);
+	  },
+          clearRanks() {
+            axios
+                .delete('/api/ranks/' + this.position.id + '/' + this.clearRankerId);
+	  },
         }
     }
 </script>

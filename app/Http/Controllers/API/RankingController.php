@@ -88,4 +88,21 @@ class RankingController extends Controller
 
       return $voters;
     }
+
+    public function destroy(Request $request, $position_id, $ranker)
+    {
+        $year = date('Y');
+
+	$query = Ranking::where('position_id',$position_id)
+		->where('year',$year);
+
+	if($ranker != 'all') {
+		$query->where('voter',$ranker);
+	}
+
+	$result = $query->delete();
+        event(new ResultsEvent());
+
+	return $result;
+    }
 }
