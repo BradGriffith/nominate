@@ -13,9 +13,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // Seed positions
+        // Seed positions and admin user
         $this->call([
           PositionSeeder::class,
+          UserSeeder::class,
         ]);
 
         // For development/testing, you can also run:

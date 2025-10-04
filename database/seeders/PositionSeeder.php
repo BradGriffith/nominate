@@ -28,7 +28,7 @@ class PositionSeeder extends Seeder
           [
             'slug' => 'diam',
             'num_to_select' => 12,
-            'is_active' => 1,
+            'is_active' => 0,
             'is_default' => 0,
           ]
         );
@@ -36,6 +36,15 @@ class PositionSeeder extends Seeder
           ['name' => 'Diaconate - Women'],
           [
             'slug' => 'diaw',
+            'num_to_select' => 12,
+            'is_active' => 0,
+            'is_default' => 0,
+          ]
+        );
+        \App\Models\Position::firstOrCreate(
+          ['name' => 'Diaconate'],
+          [
+            'slug' => 'dia',
             'num_to_select' => 12,
             'is_active' => 1,
             'is_default' => 0,
