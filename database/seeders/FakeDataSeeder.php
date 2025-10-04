@@ -24,9 +24,8 @@ class FakeDataSeeder extends Seeder
         // Ensure positions exist
         $this->call(PositionSeeder::class);
 
-        $governingBoard = Position::where('name', 'Governing Board')->first();
-        $diaconateMen = Position::where('name', 'Diaconate - Men')->first();
-        $diaconateWomen = Position::where('name', 'Diaconate - Women')->first();
+        $governingBoard = Position::find(1); // Governing Board
+        $diaconate = Position::find(4); // Diaconate
 
         // Fake nominee names
         $maleFirstNames = ['James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas', 'Charles', 'Christopher', 'Daniel', 'Matthew', 'Anthony', 'Mark', 'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua'];
@@ -45,43 +44,27 @@ class FakeDataSeeder extends Seeder
             $gbNominees[] = Nomination::create([
                 'first_name' => $firstName,
                 'last_name' => $lastName,
-                'position_id' => $governingBoard->id,
+                'position_id' => 1, // Governing Board
                 'year' => $currentYear,
             ]);
         }
         echo count($gbNominees) . " nominees created\n";
 
-        // Create nominations for Diaconate - Men (current year)
-        echo "- Diaconate - Men ({$currentYear}): ";
-        $diaMenNominees = [];
+        // Create nominations for Diaconate (current year)
+        echo "- Diaconate ({$currentYear}): ";
+        $diaconateNominees = [];
         for ($i = 0; $i < 20; $i++) {
-            $firstName = $maleFirstNames[array_rand($maleFirstNames)];
+            $firstName = ($i % 2 == 0) ? $maleFirstNames[array_rand($maleFirstNames)] : $femaleFirstNames[array_rand($femaleFirstNames)];
             $lastName = $lastNames[array_rand($lastNames)];
 
-            $diaMenNominees[] = Nomination::create([
+            $diaconateNominees[] = Nomination::create([
                 'first_name' => $firstName,
                 'last_name' => $lastName,
-                'position_id' => $diaconateMen->id,
+                'position_id' => 4, // Diaconate
                 'year' => $currentYear,
             ]);
         }
-        echo count($diaMenNominees) . " nominees created\n";
-
-        // Create nominations for Diaconate - Women (current year)
-        echo "- Diaconate - Women ({$currentYear}): ";
-        $diaWomenNominees = [];
-        for ($i = 0; $i < 20; $i++) {
-            $firstName = $femaleFirstNames[array_rand($femaleFirstNames)];
-            $lastName = $lastNames[array_rand($lastNames)];
-
-            $diaWomenNominees[] = Nomination::create([
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'position_id' => $diaconateWomen->id,
-                'year' => $currentYear,
-            ]);
-        }
-        echo count($diaWomenNominees) . " nominees created\n";
+        echo count($diaconateNominees) . " nominees created\n";
 
         // Create nominations for next year (Governing Board only)
         echo "- Governing Board ({$nextYear}): ";
@@ -93,7 +76,7 @@ class FakeDataSeeder extends Seeder
             $nextYearNominees[] = Nomination::create([
                 'first_name' => $firstName,
                 'last_name' => $lastName,
-                'position_id' => $governingBoard->id,
+                'position_id' => 1, // Governing Board
                 'year' => $nextYear,
             ]);
         }
@@ -153,7 +136,7 @@ class FakeDataSeeder extends Seeder
         }
 
         echo "\n✅ Fake data seeding complete!\n";
-        echo "   Current year ({$currentYear}): " . (count($gbNominees) + count($diaMenNominees) + count($diaWomenNominees)) . " nominations\n";
+        echo "   Current year ({$currentYear}): " . (count($gbNominees) + count($diaconateNominees)) . " nominations\n";
         echo "   Next year ({$nextYear}): " . count($nextYearNominees) . " nominations\n";
     }
 }
