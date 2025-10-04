@@ -55,6 +55,76 @@ class NominationController extends Controller
     }
 
     /**
+     * Preview import to get counts before importing
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function preview(Request $request)
+    {
+        $request->validate([
+            'position_id' => 'required|exists:positions,id',
+            'nominees_text' => 'required|string',
+        ]);
+
+        $positionId = $request->position_id;
+        $text = $request->nominees_text;
+        $year = date('Y');
+        $toImport = 0;
+        $duplicates = 0;
+
+        // Split by newlines
+        $lines = preg_split('/\r\n|\r|\n/', $text);
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line)) continue;
+
+            // Try to parse "Last, First" or "First Last" format
+            if (strpos($line, ',') !== false) {
+                $parts = array_map('trim', explode(',', $line, 2));
+                $lastName = $parts[0];
+                $firstName = $parts[1] ?? '';
+            } else {
+                $parts = preg_split('/\s+/', $line);
+                $parts = array_map('trim', $parts);
+                $parts = array_filter($parts);
+                $parts = array_values($parts);
+
+                if (count($parts) >= 2) {
+                    $lastName = array_pop($parts);
+                    $firstName = implode(' ', $parts);
+                } else {
+                    $lastName = $parts[0] ?? '';
+                    $firstName = '';
+                }
+            }
+
+            if (empty($lastName)) {
+                continue;
+            }
+
+            // Check if nominee already exists
+            $exists = Nomination::where('position_id', $positionId)
+                ->where('year', $year)
+                ->where('first_name', $firstName)
+                ->where('last_name', $lastName)
+                ->exists();
+
+            if ($exists) {
+                $duplicates++;
+            } else {
+                $toImport++;
+            }
+        }
+
+        return response()->json([
+            'to_import' => $toImport,
+            'duplicates' => $duplicates,
+        ]);
+    }
+
+    /**
      * Import nominees from text (CSV or newline-separated)
      *
      * @param  \Illuminate\Http\Request  $request
@@ -165,6 +235,37 @@ class NominationController extends Controller
     }
 
     /**
+     * Get all nominees for a specific position
+     *
+     * @param  int  $positionId
+     * @return \Illuminate\Http\Response
+     */
+    public function getByPosition($positionId)
+    {
+        return Nomination::where('position_id', $positionId)
+            ->where('year', date('Y'))
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get();
+    }
+
+    /**
+     * Check if nominee has any votes or ranks
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function hasVotesOrRanks($id)
+    {
+        $hasVotes = Vote::where('nomination_id', $id)->exists();
+        $hasRanks = Ranking::where('nomination_id', $id)->exists();
+
+        return response()->json([
+            'has_votes_or_ranks' => $hasVotes || $hasRanks
+        ]);
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
@@ -172,6 +273,18 @@ class NominationController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $nomination = Nomination::findOrFail($id);
+
+        // Delete associated votes and ranks
+        Vote::where('nomination_id', $id)->delete();
+        Ranking::where('nomination_id', $id)->delete();
+
+        // Delete the nomination
+        $nomination->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Nominee removed successfully'
+        ]);
     }
 }
