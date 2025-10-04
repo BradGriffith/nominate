@@ -48,7 +48,7 @@
             <div class="text-l inline">Change Allowed Votes/Ranks Per Person: </div>
             <div class="inline-flex">
 		<select v-model="position.num_to_select">
-		    <option v-for="i in 20">{{ i }}</option>
+		    <option v-for="i in 48">{{ i }}</option>
 		</select>
 		<button class="py-2 px-4 mx-2 bg-orange-400 hover:bg-orange-600 text-gray-200 font-bold" @click="updatePositionVoteCount">
 		    Change {{ position.name }} Votes/Ranks Allowed

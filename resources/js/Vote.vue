@@ -1,6 +1,6 @@
 <template>
     <div class="vote">
-        <div class="p-3 sm:px-10 bg-white border-t border-gray-200 fixed bottom-0 left-0 w-full italic bg-yellow-200 z-50" v-if="position.status == 'vote'">
+        <div class="step-status p-3 sm:px-10 bg-white border-t border-gray-200 fixed bottom-0 left-0 w-full italic bg-yellow-200 z-50" v-if="position.status == 'vote'">
           <p class="text-red italic">Voting is in progress. When everyone is done voting, change the current status on the Dashboard page to Ranking.</p>
         </div>
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
@@ -38,7 +38,8 @@
                 <ul class="nominees">
                   <li v-for="nominee in nominees">
                     <label class="checkmark-container">
-                      {{ nominee.name }}
+		      <img v-if="nominee.photo" :src="'/storage/nominations/' + nominee.photo" />
+                      <div class="name">{{ nominee.name }}</div>
                       <input type="checkbox" :id="'vote-' + nominee.id" :value="nominee.id" v-model="votes">
                       <span class="checkmark"></span>
                     </label>
@@ -51,9 +52,10 @@
                   <li>
                     <strong :class="{ 'done-voting': votesRemaining == 0 }">{{ votesRemaining }}</strong> selections remaining
                   </li>
+                <li><input type="submit" value="Vote" @click="postVotes" :disabled="!canSubmit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-2 rounded" /></li>
                 </ul>
-                <p class="warning bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" v-if="votesRemaining < 0">You have selected too many nominees. Please remove {{ -1*votesRemaining }} before casting your votes.</p>
-                <input type="submit" value="Vote" @click="postVotes" :disabled="!canSubmit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-2 rounded" />
+                <p class="warning bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" v-if="votesRemaining < 0">You have selected too many nominees. Please remove {{ -1*votesRemaining }} before casting your votes.
+</p>
                 </div>
               </fieldset>
             </div>
@@ -131,6 +133,7 @@
           },
           navigateAway() {
             if(this.position.status != 'vote') {
+              console.log('navigating from vote to ' + this.position.status);
               this.$inertia.visit('/' + this.position.status);
             }
           },

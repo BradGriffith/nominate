@@ -57,7 +57,7 @@
               .get('/api/positions/' + this.position_id)
               .then(response => {
                 this.position = response.data;
-                this.navigateAway();
+                //this.navigateAway();
               });
           },
         }

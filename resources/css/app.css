@@ -6,14 +6,13 @@
 .checkmark-container {
     display: block;
     position: relative;
-    padding-left: 35px;
-    margin-bottom: 12px;
     cursor: pointer;
     font-size: 22px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    text-align: center;
 }
 
 /* Hide the browser's default checkbox */
@@ -23,6 +22,7 @@
     cursor: pointer;
     height: 0;
     width: 0;
+    display: none;
 }
 
 /* Create a custom checkbox */
@@ -68,21 +68,86 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+    text-align: center;
+}
+
+.checkmark {
+	display: none;
+}
+
+li:has(input:checked) {
+    background: #fce96a;
+}
+
+li:has(option:checked) span {
+    opacity: .3;
 }
 
 ul.nominees {
-    column-count: 1;
+    display: flex;
+    flex-wrap: wrap;
     padding: 20px 0;
 }
 
-ul.nominees li {
-    padding: 10px 0;
+ul.nominees img {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    object-fit: cover;
+    object-position: 0 0;
+}
+
+ul.nominees li label {
+    padding: 20px 0;
+    margin-right: 1%;
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+}
+
+ul.nominees .name {
+    display: block;
+    width: 100%;
+}
+
+ol.ranked {
+    cursor: pointer;
 }
 
 ol.ranked,
 ol.results {
     list-style: decimal;
     padding-left: 40px;
+}
+
+.rank-button {
+    padding: 10px;
+    background: #ccc;
+    border: 1px solid #999;
+    border-radius: 3px;
+}
+
+.mode-increment .select {
+    display: none;
+}
+
+.mode-select button.rank-button {
+    display: none;
+}
+
+ul.rankings li {
+    padding: 10px;
+}
+
+ul.rankings.mode-increment li {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.change-mode {
+    cursor: pointer;
+    font-style: italic;
 }
 
 .vote-summary {
@@ -113,14 +178,22 @@ ul.voter-check li.voted {
     cursor: pointer;
 }
 
+.step-status {
+    display: none;
+}
+
+.loggedin .step-status {
+    display: block;
+}
+
 @media(min-width:481px) {
-    .vote ul.nominees {
-        column-count: 2;
+    .vote ul.nominees li {
+	width: 49%;
     }
 }
 
 @media(min-width:761px) {
-    .vote ul.nominees {
-        column-count: 3;
+    .vote ul.nominees li {
+	width: 32%;
     }
 }
