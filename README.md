@@ -31,11 +31,24 @@ This system facilitates a three-phase election process:
 ### Using Docker (Recommended for Development)
 
 ```bash
-# Run the setup script
+# Initial setup
+./dev setup
+
+# Or use the old setup script
 ./build/setup.sh
 ```
 
 This will set up a complete development environment with PHP, MySQL, Redis, and Nginx.
+
+**Quick commands:**
+```bash
+./dev setup          # Initial setup
+./dev fresh          # Reset database with test data
+./dev db             # Enter database CLI
+./dev shell          # Enter app container
+./dev artisan <cmd>  # Run artisan commands
+```
+
 See [build/README.md](build/README.md) for detailed Docker documentation.
 
 ### Manual Installation
@@ -79,20 +92,46 @@ npm run dev
 
 ## Development
 
-### Docker
+### Docker (./dev script)
+
+The `./dev` script provides a complete management interface:
 
 ```bash
-# View logs
-docker-compose logs -f app
+# Setup & Management
+./dev setup              # Initial setup
+./dev start              # Start containers
+./dev stop               # Stop containers
+./dev restart            # Restart containers
+./dev logs [service]     # View logs
 
-# Run artisan commands
-docker-compose exec app php artisan [command]
+# Database
+./dev db                 # Enter MySQL CLI
+./dev migrate            # Run migrations
+./dev fresh              # Reset database with test data
+./dev seed               # Run seeders
+./dev seed:fake          # Seed fake test data
 
-# Access the application
-# Web: http://localhost:8000
+# Shell Access
+./dev shell              # Bash shell in app container
+./dev tinker             # Laravel Tinker REPL
+./dev artisan <cmd>      # Run artisan command
+./dev composer <cmd>     # Run composer command
+./dev npm <cmd>          # Run npm command
+
+# Development
+./dev build              # Build production assets
+./dev dev                # Build development assets
+./dev watch              # Watch and rebuild assets
+./dev test               # Run PHPUnit tests
 ```
 
-### Manual
+**Via npm:**
+```bash
+npm run docker setup     # Same as ./dev setup
+npm run docker fresh     # Same as ./dev fresh
+```
+
+### Manual (Non-Docker)
 
 ```bash
 # Start development server

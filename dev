@@ -1,0 +1,259 @@
+#!/bin/bash
+
+# Nominate Development Environment Manager
+# Usage: ./dev <command>
+
+set -e
+
+# Detect docker compose command (docker-compose vs docker compose)
+if command -v docker-compose &> /dev/null; then
+    DC="docker-compose"
+elif docker compose version &> /dev/null 2>&1; then
+    DC="docker compose"
+else
+    echo "❌ Docker Compose not found. Please install Docker Compose and try again."
+    exit 1
+fi
+
+# Colors for output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Show usage
+show_usage() {
+    echo -e "${BLUE}Nominate Development Environment Manager${NC}"
+    echo ""
+    echo "Usage: ./dev <command> [options]"
+    echo ""
+    echo -e "${GREEN}Setup & Management:${NC}"
+    echo "  setup              Initial setup (containers, dependencies, migrations)"
+    echo "  start              Start all containers"
+    echo "  stop               Stop all containers"
+    echo "  restart            Restart all containers"
+    echo "  destroy            Stop and remove all containers and volumes"
+    echo "  logs [service]     View logs (optionally for specific service)"
+    echo ""
+    echo -e "${GREEN}Database:${NC}"
+    echo "  db                 Enter MySQL database CLI"
+    echo "  migrate            Run database migrations"
+    echo "  migrate:fresh      Drop all tables and re-run migrations"
+    echo "  migrate:refresh    Rollback and re-run migrations"
+    echo "  seed               Run database seeders"
+    echo "  seed:fake          Run fake data seeder"
+    echo "  fresh              migrate:fresh + seed + voyager:install + seed:fake"
+    echo ""
+    echo -e "${GREEN}Shell Access:${NC}"
+    echo "  shell              Enter app container bash shell"
+    echo "  tinker             Enter Laravel Tinker REPL"
+    echo "  artisan <cmd>      Run artisan command"
+    echo "  composer <cmd>     Run composer command"
+    echo "  npm <cmd>          Run npm command"
+    echo ""
+    echo -e "${GREEN}Development:${NC}"
+    echo "  build              Build frontend assets (production)"
+    echo "  dev                Build frontend assets (development)"
+    echo "  watch              Watch and rebuild frontend assets"
+    echo "  test               Run PHPUnit tests"
+    echo ""
+    echo "Examples:"
+    echo "  ./dev setup                     # Initial setup"
+    echo "  ./dev db                        # Enter database"
+    echo "  ./dev artisan route:list        # List all routes"
+    echo "  ./dev fresh                     # Reset everything with test data"
+}
+
+# Check if Docker is running
+check_docker() {
+    if ! docker info > /dev/null 2>&1; then
+        echo -e "${RED}❌ Docker is not running. Please start Docker and try again.${NC}"
+        exit 1
+    fi
+}
+
+# Setup command
+cmd_setup() {
+    echo -e "${BLUE}🚀 Setting up Nominate development environment...${NC}"
+
+    check_docker
+
+    # Copy environment file if it doesn't exist
+    if [ ! -f .env ]; then
+        echo "📝 Creating .env file from .env.docker..."
+        cp .env.docker .env
+        echo -e "${YELLOW}⚠️  Remember to update PUSHER credentials in .env!${NC}"
+    else
+        echo "ℹ️  .env file already exists, skipping..."
+    fi
+
+    # Start Docker containers
+    echo "🐳 Starting Docker containers..."
+    $DC up -d
+
+    # Wait for database to be ready
+    echo "⏳ Waiting for database to be ready..."
+    sleep 10
+
+    # Install Composer dependencies
+    echo "📦 Installing Composer dependencies..."
+    $DC exec -T app composer install --no-interaction
+
+    # Generate application key
+    echo "🔑 Generating application key..."
+    $DC exec -T app php artisan key:generate
+
+    # Run migrations and seeders
+    echo "📊 Running database migrations..."
+    $DC exec -T app php artisan migrate --force
+
+    echo "🌱 Seeding database..."
+    $DC exec -T app php artisan db:seed
+
+    # Set permissions
+    echo "🔒 Setting file permissions..."
+    $DC exec -T app chmod -R 775 storage bootstrap/cache
+    $DC exec -T app chown -R nominate:nominate storage bootstrap/cache
+
+    # Install and build frontend assets
+    echo "🎨 Installing npm dependencies and building assets..."
+    $DC exec -T node npm install
+    $DC exec -T node npm run dev
+
+    echo ""
+    echo -e "${GREEN}✅ Setup complete!${NC}"
+    echo ""
+    echo "📍 Your application is available at: http://localhost:8000"
+    echo ""
+    echo "Next steps:"
+    echo "1. Update Pusher credentials in .env"
+    echo "2. Run: ./dev restart"
+    echo "3. Run: ./dev fresh        # To install Voyager and seed test data"
+}
+
+# Fresh install with test data
+cmd_fresh() {
+    echo -e "${BLUE}🔄 Resetting database with fresh data...${NC}"
+
+    echo "📊 Running fresh migrations and seeding..."
+    $DC exec app php artisan migrate:fresh --seed
+
+    echo "🎭 Installing Voyager..."
+    $DC exec app php artisan voyager:install
+
+    echo "👤 Setting admin user..."
+    $DC exec app php artisan voyager:admin brad@bradgriffith.com
+
+    echo "🎲 Seeding fake test data..."
+    $DC exec app php artisan db:seed --class=FakeDataSeeder
+
+    echo ""
+    echo -e "${GREEN}✅ Database reset complete!${NC}"
+    echo "Login: brad@bradgriffith.com / password"
+}
+
+# Main command dispatcher
+COMMAND=${1:-help}
+
+case $COMMAND in
+    # Setup & Management
+    setup)
+        cmd_setup
+        ;;
+    start)
+        check_docker
+        echo "🐳 Starting containers..."
+        $DC up -d
+        ;;
+    stop)
+        echo "🛑 Stopping containers..."
+        $DC down
+        ;;
+    restart)
+        echo "🔄 Restarting containers..."
+        $DC restart
+        ;;
+    destroy)
+        echo -e "${YELLOW}⚠️  This will destroy all containers and volumes!${NC}"
+        read -p "Are you sure? (y/N) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            $DC down -v
+            echo -e "${GREEN}✅ Containers and volumes destroyed${NC}"
+        fi
+        ;;
+    logs)
+        SERVICE=${2:-app}
+        $DC logs -f $SERVICE
+        ;;
+
+    # Database
+    db)
+        $DC exec db mysql -u nominate -psecret nominate
+        ;;
+    migrate)
+        $DC exec app php artisan migrate
+        ;;
+    migrate:fresh)
+        $DC exec app php artisan migrate:fresh
+        ;;
+    migrate:refresh)
+        $DC exec app php artisan migrate:refresh
+        ;;
+    seed)
+        $DC exec app php artisan db:seed
+        ;;
+    seed:fake)
+        $DC exec app php artisan db:seed --class=FakeDataSeeder
+        ;;
+    fresh)
+        cmd_fresh
+        ;;
+
+    # Shell Access
+    shell)
+        $DC exec app bash
+        ;;
+    tinker)
+        $DC exec app php artisan tinker
+        ;;
+    artisan)
+        shift
+        $DC exec app php artisan "$@"
+        ;;
+    composer)
+        shift
+        $DC exec app composer "$@"
+        ;;
+    npm)
+        shift
+        $DC exec node npm "$@"
+        ;;
+
+    # Development
+    build)
+        $DC exec node npm run production
+        ;;
+    dev)
+        $DC exec node npm run dev
+        ;;
+    watch)
+        $DC exec node npm run watch
+        ;;
+    test)
+        $DC exec app php artisan test
+        ;;
+
+    # Help
+    help|--help|-h|"")
+        show_usage
+        ;;
+
+    *)
+        echo -e "${RED}❌ Unknown command: $COMMAND${NC}"
+        echo ""
+        show_usage
+        exit 1
+        ;;
+esac
