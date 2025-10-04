@@ -9,6 +9,13 @@ class Nomination extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'position_id',
+        'year',
+    ];
+
     public function getNameAttribute() {
       return $this->last_name . ', ' . $this->first_name;
     }
