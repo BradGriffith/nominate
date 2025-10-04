@@ -1,0 +1,82 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    container_name: nominate-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./storage:/var/www/storage
+    networks:
+      - nominate
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=nominate
+      - DB_USERNAME=nominate
+      - DB_PASSWORD=secret
+      - REDIS_HOST=redis
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+
+  webserver:
+    image: nginx:alpine
+    container_name: nominate-webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./build/nginx:/etc/nginx/conf.d
+    networks:
+      - nominate
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: nominate-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: nominate
+      MYSQL_USER: nominate
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - nominate
+
+  redis:
+    image: redis:alpine
+    container_name: nominate-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - nominate
+
+  node:
+    image: node:16
+    container_name: nominate-node
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    command: sh -c "npm install && npm run watch"
+    networks:
+      - nominate
+
+networks:
+  nominate:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local

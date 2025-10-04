@@ -28,6 +28,18 @@ This system facilitates a three-phase election process:
 
 ## Installation
 
+### Using Docker (Recommended for Development)
+
+```bash
+# Run the setup script
+./build/setup.sh
+```
+
+This will set up a complete development environment with PHP, MySQL, Redis, and Nginx.
+See [build/README.md](build/README.md) for detailed Docker documentation.
+
+### Manual Installation
+
 1. Clone the repository and install dependencies:
 ```bash
 composer install
@@ -66,6 +78,21 @@ npm run dev
 ```
 
 ## Development
+
+### Docker
+
+```bash
+# View logs
+docker-compose logs -f app
+
+# Run artisan commands
+docker-compose exec app php artisan [command]
+
+# Access the application
+# Web: http://localhost:8000
+```
+
+### Manual
 
 ```bash
 # Start development server
