@@ -77,9 +77,16 @@
                   </li>
                 </ul>
 
-                <p class="warning bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" v-if="ranksRemaining < 0">You must rank all nominees before submitting. You're still missing {{ rankingsRemaining }} rankings.</p>
+                <p class="warning bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" v-if="ranksRemaining > 0">You must rank all nominees before submitting. You still need to rank {{ ranksRemaining }} more nominee{{ ranksRemaining !== 1 ? 's' : '' }}.</p>
 
-                <input type="submit" value="Submit Rankings" @click="postVotes" @click.prevent="!canSubmit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-2 rounded mb-20" />
+                <button
+                    @click="postVotes"
+                    :disabled="!canSubmit"
+                    :class="{'bg-blue-500 hover:bg-blue-700': canSubmit, 'bg-gray-300 cursor-not-allowed': !canSubmit}"
+                    class="text-white font-bold py-2 px-4 my-2 rounded mb-20"
+                >
+                    Submit Rankings
+                </button>
                 </div>
                 </div>
                 </div>
@@ -128,7 +135,7 @@
           ranksCompleted: function() { return this.ranks.filter(r => r).length; },
           ranksRemaining: function() { return this.nominees.length - this.ranks.filter(r => r).length; },
           rankingOptions: function() { return Array.from({length: this.nominees.length}, (_, i) => i + 1) },
-          canSubmit () { this.ranks.filter(r => r === null).length == 0; },
+          canSubmit () { return this.ranksRemaining === 0; },
         },
         mounted () {
           window.Echo.channel("position-channel").listen(".position-updated", e => {
@@ -172,6 +179,12 @@
             }
           },
           postVotes() {
+            // Validate that all nominees are ranked
+            if (!this.canSubmit) {
+              alert(`You must rank all nominees before submitting. You still need to rank ${this.ranksRemaining} more nominee${this.ranksRemaining !== 1 ? 's' : ''}.`);
+              return;
+            }
+
             var filtered_ranks = this.ranks.map((val, i) => (val == null ? null : {id:i,rank:val})).filter(val => val != null );
             axios.post('/api/ranks', {
               voter: this.voter,
