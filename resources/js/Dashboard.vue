@@ -81,6 +81,44 @@
 		    </div>
 	    </div>
         </div>
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg" v-if="$page.user">
+            <div class="text-xl mb-4">Import Nominees</div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Position:</label>
+                <select v-model="importPositionId" class="block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">-- Select Position --</option>
+                    <option v-for="pos in positions" :key="pos.id" :value="pos.id">{{ pos.name }}</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Enter Nominees (one per line, format: "Last, First" or "First Last"):
+                </label>
+                <textarea
+                    v-model="nomineesText"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    rows="10"
+                    placeholder="Smith, John
+Jane Doe
+Brown, Alice"
+                ></textarea>
+            </div>
+            <div class="mb-4">
+                <button
+                    @click="importNominees"
+                    :disabled="!importPositionId || !nomineesText.trim()"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                    Add Nominees
+                </button>
+            </div>
+            <div v-if="importMessage" class="p-4 rounded-md" :class="{'bg-green-100 border border-green-400 text-green-700': importSuccess, 'bg-red-100 border border-red-400 text-red-700': !importSuccess}">
+                <p class="font-bold">{{ importMessage }}</p>
+                <ul v-if="importErrors.length" class="list-disc list-inside mt-2">
+                    <li v-for="error in importErrors" :key="error">{{ error }}</li>
+                </ul>
+            </div>
+        </div>
         <div class="p-6 sm:px-20 bg-white border-b border-gray-200 shadow-xl my-10 rounded-lg">
             <div class="text-xl">Voting</div>
             <div v-if="position.status.length">
@@ -139,6 +177,11 @@
               rankersReceived: [],
               clearVoterId: 0,
               clearRankerId: 0,
+              importPositionId: '',
+              nomineesText: '',
+              importMessage: '',
+              importSuccess: false,
+              importErrors: [],
             };
         },
         computed: {
@@ -197,6 +240,38 @@
             axios
                 .delete('/api/ranks/' + this.position.id + '/' + this.clearRankerId);
 	  },
+          importNominees() {
+            // Clear previous messages
+            this.importMessage = '';
+            this.importSuccess = false;
+            this.importErrors = [];
+
+            // Send import request
+            axios
+                .post('/api/nominations/import', {
+                    position_id: this.importPositionId,
+                    nominees_text: this.nomineesText
+                })
+                .then(response => {
+                    this.importSuccess = true;
+                    this.importMessage = response.data.message;
+                    this.importErrors = response.data.errors || [];
+
+                    // Clear the textarea on success if all imported
+                    if (response.data.imported > 0 && response.data.skipped === 0) {
+                        this.nomineesText = '';
+                    }
+                })
+                .catch(error => {
+                    this.importSuccess = false;
+                    if (error.response && error.response.data && error.response.data.message) {
+                        this.importMessage = error.response.data.message;
+                    } else {
+                        this.importMessage = 'An error occurred while importing nominees.';
+                    }
+                    console.error('Import error:', error);
+                });
+          },
         }
     }
 </script>

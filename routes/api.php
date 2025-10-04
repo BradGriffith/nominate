@@ -34,5 +34,7 @@ Route::get('ranks/nominees/{position_id}', 'App\Http\Controllers\API\RankingCont
 
 Route::get('results', 'App\Http\Controllers\API\NominationController@getResults');
 
+Route::post('nominations/import', 'App\Http\Controllers\API\NominationController@import');
+
 Route::delete('votes/{position_id}/{voter}', 'App\Http\Controllers\API\VoteController@destroy');
 Route::delete('ranks/{position_id}/{ranker}', 'App\Http\Controllers\API\RankingController@destroy');
