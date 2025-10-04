@@ -1,61 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Nomination & Voting System
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+A Laravel-based application for conducting multi-phase elections with voting and ranked-choice ranking.
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This system facilitates a three-phase election process:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. **Voting Phase** - Users vote for their preferred nominees from a list of candidates
+2. **Ranking Phase** - Users rank the top vote-getters in order of preference
+3. **Results Phase** - Final results displayed based on ranked-choice voting (lowest sum of ranks wins)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+- Real-time updates using Laravel Echo and Pusher
+- Cookie-based voter tracking (no login required for voting/ranking)
+- Admin dashboard for managing positions and viewing participation
+- Automatic tie handling in vote counts
+- Year-based election management
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Requirements
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.1+
+- Composer
+- Node.js & NPM
+- MySQL/PostgreSQL database
+- Pusher account (for real-time features)
 
-## Laravel Sponsors
+## Installation
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+1. Clone the repository and install dependencies:
+```bash
+composer install
+npm install
+```
 
-### Premium Partners
+2. Configure environment:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+3. Update `.env` with your database and Pusher credentials:
+```
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
 
-## Contributing
+BROADCAST_DRIVER=pusher
+PUSHER_APP_ID=your_app_id
+PUSHER_APP_KEY=your_app_key
+PUSHER_APP_SECRET=your_app_secret
+PUSHER_APP_CLUSTER=your_cluster
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+VOTER_COUNT=24  # Number of voters
+```
 
-## Code of Conduct
+4. Run migrations:
+```bash
+php artisan migrate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. Build assets:
+```bash
+npm run dev
+```
 
-## Security Vulnerabilities
+## Development
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+# Start development server
+php artisan serve
+
+# Watch and compile frontend assets
+npm run watch
+
+# Build for production
+npm run prod
+```
+
+## Usage
+
+### Setting Up an Election
+
+1. Access admin panel at `/admin` (requires authentication)
+2. Create a new Position (e.g., "President 2025")
+3. Add Nominations for that position
+4. Set the position as default to make it active
+
+### Running the Election
+
+**Phase 1: Voting**
+- Users visit `/vote`
+- Select their voter number (1-N)
+- Choose nominees to vote for
+- System tracks who has voted
+
+**Phase 2: Ranking**
+- Admin changes position status to "rank" via Dashboard
+- System automatically determines top nominees (including ties)
+- Users visit `/rank` to order their preferences
+- Lower rank number = higher preference
+
+**Phase 3: Results**
+- Admin changes position status to "results"
+- Users redirected to `/results`
+- Winners determined by lowest sum of ranks
+
+### Admin Functions
+
+- View voters/rankers who have participated
+- Delete votes or rankings for specific users
+- Change number of nominees to select
+- Control election phase transitions
+
+## Testing
+
+```bash
+php artisan test
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT License
