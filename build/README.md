@@ -72,6 +72,19 @@ docker compose down
 docker compose down -v
 ```
 
+## Seeding Test Data
+
+To populate the database with fake data for testing:
+
+```bash
+docker compose exec app php artisan db:seed --class=FakeDataSeeder
+```
+
+This will create:
+- Nominations for current year and next year
+- Fake votes (60% of voters)
+- Fake rankings (if position is in ranking phase)
+
 ## Voyager Admin Setup
 
 1. Install Voyager:

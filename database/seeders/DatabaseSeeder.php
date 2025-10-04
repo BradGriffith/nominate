@@ -13,9 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        // Seed positions
         $this->call([
           PositionSeeder::class,
         ]);
+
+        // For development/testing, you can also run:
+        // php artisan db:seed --class=FakeDataSeeder
     }
 }
