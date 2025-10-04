@@ -48,7 +48,7 @@ class Ranking extends Model
       $winners = static::where('year', date('Y'))
           ->where('position_id', $position_id)
           ->groupBy('nomination_id')
-          ->selectRaw('sum(rank) as sum, nomination_id')
+          ->selectRaw('sum(`rank`) as sum, nomination_id')
           ->orderBy('sum')
           ->with('nomination')
           ->get();

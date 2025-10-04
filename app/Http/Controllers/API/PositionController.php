@@ -15,7 +15,7 @@ class PositionController extends Controller
      */
     public function index()
     {
-        return Position::all();
+        return Position::where('is_active', 1)->get();
     }
 
     /**
