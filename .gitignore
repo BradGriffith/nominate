@@ -10,3 +10,22 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+
+# Composer
+composer.phar
+
+# Database dumps
+*.sql
+
+# htpasswd files (contain sensitive authentication data)
+.htpasswd
+.htpasswdnew
+public/.htpasswd*
+
+# Hosting-specific files
+public/.dh-diag
+
+# Built assets (generated from source)
+/public/css/app.css
+/public/js/app.js
+/public/mix-manifest.json
