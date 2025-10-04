@@ -19,3 +19,8 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+AuthName "Nominating Committee Only"
+AuthUserFile /home/fccnom/nominate/public/.htpasswd
+AuthType Basic
+Require valid-user
