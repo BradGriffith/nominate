@@ -48,7 +48,7 @@
 <button class="rank-button" @click="rankChange(nominee.id,-1)">&uarr;</button>
                     <div class="select inline-block relative w-20">
                       <select :id="'vote-' + nominee.id" v-model="ranks[nominee.id]" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                          <option vale=""></option>
+                          <option value=""></option>
                           <option v-for="rank in rankingOptionsLeft(nominee.id)" :value="rank">{{ rank }}</option>
                       </select>
                       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -132,8 +132,16 @@
           },
         },
         computed: {
-          ranksCompleted: function() { return this.ranks.filter(r => r).length; },
-          ranksRemaining: function() { return this.nominees.length - this.ranks.filter(r => r).length; },
+          ranksCompleted: function() {
+            let count = 0;
+            for (let i = 0; i < this.ranks.length; i++) {
+              if (this.ranks[i] != null && this.ranks[i] !== '') count++;
+            }
+            return count;
+          },
+          ranksRemaining: function() {
+            return this.nominees.length - this.ranksCompleted;
+          },
           rankingOptions: function() { return Array.from({length: this.nominees.length}, (_, i) => i + 1) },
           canSubmit () { return this.ranksRemaining === 0; },
         },
@@ -213,14 +221,14 @@
           selectNextRank(nominee_id) {
             // Clear the nominee's rank if one is already set
             if(this.ranks[nominee_id]) {
-this.ranks[nominee_id] = null;
+              this.$set(this.ranks, nominee_id, null);
             } else {
 
 	      // get the next available option
 	      var next_rank = this.rankingOptions.reduce((min, cur) => { return cur < min && this.ranks.indexOf(cur) == -1 ? cur : min },100);
 
 	      // set the ranking
-	      this.ranks[nominee_id] = next_rank;
+	      this.$set(this.ranks, nominee_id, next_rank);
 	    }
 
             // force UI update to fix select checked options
@@ -234,9 +242,9 @@ this.ranks[nominee_id] = null;
 	    }
 	    for(var i in this.ranks) {
 	      if(this.ranks[i] == rank) {
-	        this.ranks[i] += change;
+	        this.$set(this.ranks, i, this.ranks[i] + change);
 	      } else if(this.ranks[i] == new_rank) {
-		this.ranks[i] += -1*change;
+		this.$set(this.ranks, i, this.ranks[i] + (-1*change));
 	      }
 	    }
             this.$forceUpdate();
@@ -248,7 +256,7 @@ this.ranks[nominee_id] = null;
 	    let shift = this.ranks.includes(rank) ? 1 : -1; // if the rank is filled, move down; else move up
 	    for(var i in this.ranks) {
 	      if(this.ranks[i] >= rank) {
-	        this.ranks[i] += shift;
+	        this.$set(this.ranks, i, this.ranks[i] + shift);
 	      }
 	    }
             this.$forceUpdate();
