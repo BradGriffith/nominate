@@ -87,9 +87,13 @@ class FakeDataSeeder extends Seeder
         $voterCount = config('fcc.voter_count', 24);
         $numToVoteFor = $governingBoard->num_to_select;
 
-        // Have 60% of voters vote
+        // Have 60% of voters vote - use random non-sequential voter numbers
         $votersWhoVoted = (int)($voterCount * 0.6);
-        for ($voter = 1; $voter <= $votersWhoVoted; $voter++) {
+        $allVoterNumbers = range(1, $voterCount);
+        shuffle($allVoterNumbers);
+        $randomVoters = array_slice($allVoterNumbers, 0, $votersWhoVoted);
+
+        foreach ($randomVoters as $voter) {
             // Each voter votes for the required number of nominees
             $selectedNominees = array_rand($gbNominees, min($numToVoteFor, count($gbNominees)));
             if (!is_array($selectedNominees)) {
@@ -115,9 +119,13 @@ class FakeDataSeeder extends Seeder
             $topNominees = Nomination::getNomineesForRanking($governingBoard->id);
 
             if (count($topNominees) > 0) {
-                // Have 50% of voters rank
+                // Have 50% of voters rank - use random non-sequential voter numbers
                 $rankersWhoRanked = (int)($voterCount * 0.5);
-                for ($ranker = 1; $ranker <= $rankersWhoRanked; $ranker++) {
+                $allRankerNumbers = range(1, $voterCount);
+                shuffle($allRankerNumbers);
+                $randomRankers = array_slice($allRankerNumbers, 0, $rankersWhoRanked);
+
+                foreach ($randomRankers as $ranker) {
                     // Shuffle nominees and assign ranks
                     $shuffled = $topNominees->shuffle();
 
