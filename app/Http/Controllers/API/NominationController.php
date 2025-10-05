@@ -83,8 +83,8 @@ class NominationController extends Controller
             // Try to parse "Last, First" or "First Last" format
             if (strpos($line, ',') !== false) {
                 $parts = array_map('trim', explode(',', $line, 2));
-                $lastName = $parts[0];
-                $firstName = $parts[1] ?? '';
+                $lastName = trim($parts[0]);
+                $firstName = trim($parts[1] ?? '');
             } else {
                 $parts = preg_split('/\s+/', $line);
                 $parts = array_map('trim', $parts);
@@ -92,10 +92,10 @@ class NominationController extends Controller
                 $parts = array_values($parts);
 
                 if (count($parts) >= 2) {
-                    $lastName = array_pop($parts);
-                    $firstName = implode(' ', $parts);
+                    $lastName = trim(array_pop($parts));
+                    $firstName = trim(implode(' ', $parts));
                 } else {
-                    $lastName = $parts[0] ?? '';
+                    $lastName = trim($parts[0] ?? '');
                     $firstName = '';
                 }
             }
@@ -104,11 +104,11 @@ class NominationController extends Controller
                 continue;
             }
 
-            // Check if nominee already exists
+            // Check if nominee already exists (case-insensitive)
             $exists = Nomination::where('position_id', $positionId)
                 ->where('year', $year)
-                ->where('first_name', $firstName)
-                ->where('last_name', $lastName)
+                ->whereRaw('LOWER(TRIM(first_name)) = ?', [strtolower($firstName)])
+                ->whereRaw('LOWER(TRIM(last_name)) = ?', [strtolower($lastName)])
                 ->exists();
 
             if ($exists) {
@@ -125,7 +125,7 @@ class NominationController extends Controller
     }
 
     /**
-     * Import nominees from text (CSV or newline-separated)
+     * Add nominees from text (CSV or newline-separated)
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -140,7 +140,7 @@ class NominationController extends Controller
         $positionId = $request->position_id;
         $text = $request->nominees_text;
         $year = date('Y');
-        $imported = 0;
+        $added = 0;
         $skipped = 0;
         $errors = [];
 
@@ -155,8 +155,8 @@ class NominationController extends Controller
             if (strpos($line, ',') !== false) {
                 // Format: "Last, First"
                 $parts = array_map('trim', explode(',', $line, 2));
-                $lastName = $parts[0];
-                $firstName = $parts[1] ?? '';
+                $lastName = trim($parts[0]);
+                $firstName = trim($parts[1] ?? '');
             } else {
                 // Format: "First Last" - split on whitespace (spaces or tabs)
                 $parts = preg_split('/\s+/', $line);
@@ -165,10 +165,10 @@ class NominationController extends Controller
                 $parts = array_values($parts); // Re-index array
 
                 if (count($parts) >= 2) {
-                    $lastName = array_pop($parts);
-                    $firstName = implode(' ', $parts);
+                    $lastName = trim(array_pop($parts));
+                    $firstName = trim(implode(' ', $parts));
                 } else {
-                    $lastName = $parts[0] ?? '';
+                    $lastName = trim($parts[0] ?? '');
                     $firstName = '';
                 }
             }
@@ -179,11 +179,11 @@ class NominationController extends Controller
                 continue;
             }
 
-            // Check if nominee already exists
+            // Check if nominee already exists (case-insensitive)
             $exists = Nomination::where('position_id', $positionId)
                 ->where('year', $year)
-                ->where('first_name', $firstName)
-                ->where('last_name', $lastName)
+                ->whereRaw('LOWER(TRIM(first_name)) = ?', [strtolower($firstName)])
+                ->whereRaw('LOWER(TRIM(last_name)) = ?', [strtolower($lastName)])
                 ->exists();
 
             if ($exists) {
@@ -191,7 +191,7 @@ class NominationController extends Controller
                 continue;
             }
 
-            // Create nominee
+            // Create nominee (store trimmed values)
             Nomination::create([
                 'first_name' => $firstName,
                 'last_name' => $lastName,
@@ -199,15 +199,15 @@ class NominationController extends Controller
                 'year' => $year,
             ]);
 
-            $imported++;
+            $added++;
         }
 
         return response()->json([
             'success' => true,
-            'imported' => $imported,
+            'added' => $added,
             'skipped' => $skipped,
             'errors' => $errors,
-            'message' => "Imported {$imported} nominee(s). Skipped {$skipped} duplicate(s)."
+            'message' => "Added {$added} nominee(s). Skipped {$skipped} duplicate(s)."
         ]);
     }
 
