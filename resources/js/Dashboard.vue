@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="p-3 sm:px-10 bg-white border-t border-gray-200 fixed bottom-0 left-0 w-full italic bg-yellow-200 z-50">
-          <p v-if="position.status == 'vote'">Voting is in progress. When everyone is done voting, click "Start Ranking &raquo;" above.</p>
-          <p v-if="position.status == 'rank'">Ranking is in progress. When everyone is done ranking, click "Stop Ranking and Show Final Results &raquo;" above.</p>
-          <p v-if="position.status == 'results'">Results are complete. To start voting on a different position, click the name of the position above.</p>
+          <p v-if="position.status == 'vote'">Voting is in progress. When everyone is done voting, click <span class="text-blue-600 font-bold">→</span> to change the status to rank.</p>
+          <p v-if="position.status == 'rank'">Ranking is in progress. When everyone is done ranking, click <span class="text-blue-600 font-bold">→</span> above to show results.</p>
+          <p v-if="position.status == 'results'">Results are complete. To vote on a different position, click the name of the position in the Admin Controls.</p>
         </div>
         <div class="p-6 sm:px-20 bg-white rounded-t-lg">
             <div class="text-gray-500">
@@ -14,18 +14,18 @@
             <p class="flex items-center gap-2">
                 <span>Current Status:</span>
                 <button
+                    v-if="position.status != 'vote'"
                     @click="moveToPreviousStatus"
-                    :disabled="position.status == 'vote'"
-                    class="px-2 py-1 text-xl font-bold rounded disabled:text-gray-300 disabled:cursor-not-allowed enabled:text-blue-600 enabled:hover:bg-blue-100"
+                    class="px-2 py-1 text-xl font-bold rounded text-blue-600 hover:bg-blue-100"
                     title="Move to previous status"
                 >
                     ←
                 </button>
                 <span class="font-semibold">{{ position.status }}</span>
                 <button
+                    v-if="position.status != 'results'"
                     @click="moveToNextStatus"
-                    :disabled="position.status == 'results'"
-                    class="px-2 py-1 text-xl font-bold rounded disabled:text-gray-300 disabled:cursor-not-allowed enabled:text-blue-600 enabled:hover:bg-blue-100"
+                    class="px-2 py-1 text-xl font-bold rounded text-blue-600 hover:bg-blue-100"
                     title="Move to next status"
                 >
                     →
@@ -195,14 +195,14 @@ Brown, Alice"
                 </div>
             </div>
         </div>
-        <!-- Import Confirmation Modal -->
+        <!-- Add Nominees Confirmation Modal -->
         <div v-if="showImportModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="showImportModal = false">
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div class="mt-3 text-center">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Confirm Import</h3>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Confirm Add</h3>
                     <div class="mt-2 px-7 py-3">
                         <p class="text-sm text-gray-500">
-                            You are about to import <strong>{{ importPreview.toImport }}</strong> nominee{{ importPreview.toImport !== 1 ? 's' : '' }}.
+                            You are about to add <strong>{{ importPreview.toImport }}</strong> nominee{{ importPreview.toImport !== 1 ? 's' : '' }}.
                         </p>
                         <p v-if="importPreview.duplicates > 0" class="text-sm text-gray-500 mt-2">
                             <strong>{{ importPreview.duplicates }}</strong> duplicate{{ importPreview.duplicates !== 1 ? 's' : '' }} will be skipped.
@@ -219,7 +219,7 @@ Brown, Alice"
                             @click="proceedWithImport"
                             class="px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none"
                         >
-                            Import
+                            Add Nominees
                         </button>
                     </div>
                 </div>
@@ -452,7 +452,7 @@ Brown, Alice"
             this.importSuccess = false;
             this.importErrors = [];
 
-            // Preview the import to get counts
+            // Preview the add to get counts
             axios
                 .post('/api/nominations/preview', {
                     position_id: this.managePositionId,
@@ -470,7 +470,7 @@ Brown, Alice"
                     if (error.response && error.response.data && error.response.data.message) {
                         this.importMessage = error.response.data.message;
                     } else {
-                        this.importMessage = 'An error occurred while previewing import.';
+                        this.importMessage = 'An error occurred while previewing nominees.';
                     }
                     console.error('Preview error:', error);
                 });
@@ -479,7 +479,7 @@ Brown, Alice"
             // Close modal
             this.showImportModal = false;
 
-            // Send import request
+            // Send add request
             axios
                 .post('/api/nominations/import', {
                     position_id: this.managePositionId,
@@ -490,8 +490,8 @@ Brown, Alice"
                     this.importMessage = response.data.message;
                     this.importErrors = response.data.errors || [];
 
-                    // Clear the textarea on success if all imported
-                    if (response.data.imported > 0 && response.data.skipped === 0) {
+                    // Clear the textarea on success if all added
+                    if (response.data.added > 0 && response.data.skipped === 0) {
                         this.nomineesText = '';
                     }
 
@@ -503,9 +503,9 @@ Brown, Alice"
                     if (error.response && error.response.data && error.response.data.message) {
                         this.importMessage = error.response.data.message;
                     } else {
-                        this.importMessage = 'An error occurred while importing nominees.';
+                        this.importMessage = 'An error occurred while adding nominees.';
                     }
-                    console.error('Import error:', error);
+                    console.error('Add error:', error);
                 });
           },
           loadNomineesForPosition(positionId) {
