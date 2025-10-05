@@ -37,7 +37,7 @@
                 <div v-if="voter">
                 <ul class="nominees">
                   <li v-for="nominee in nominees">
-                    <label class="checkmark-container">
+                    <label class="checkmark-container" @click="handleNomineeClick(nominee.id, $event)">
 		      <img v-if="nominee.photo" :src="'/storage/nominations/' + nominee.photo" />
                       <div class="name">{{ nominee.name }}</div>
                       <input type="checkbox" :id="'vote-' + nominee.id" :value="nominee.id" v-model="votes">
@@ -61,13 +61,34 @@
             </div>
           </div>
         </div>
+        <!-- Maximum Votes Modal -->
+        <div v-if="showMaxVotesModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="showMaxVotesModal = false">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3 text-center">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Maximum Votes Reached</h3>
+                    <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-500">
+                            You have already selected the maximum number of nominees ({{ position.num_to_select }}). Please tap a highlighted name to deselect it before selecting another.<br/><br/>If you are done voting, click "Vote".
+                        </p>
+                    </div>
+                    <div class="flex justify-center px-4 py-3">
+                        <button
+                            @click="showMaxVotesModal = false"
+                            class="px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
     import axios from 'axios';
-    import Vue from 'vue';
-    import VueCookies from 'vue-cookies';
+import Vue from 'vue';
+import VueCookies from 'vue-cookies';
     Vue.use(VueCookies);
 
     export default {
@@ -87,8 +108,8 @@
               voter: 0,
               votesCast: false,
               votersCompleted: [],
-              nominees: [
-              ]
+              nominees: [],
+              showMaxVotesModal: false,
             };
         },
         props: [
@@ -125,6 +146,13 @@
             .then(response => (this.nominees = response.data));
         },
         methods: {
+          handleNomineeClick(nomineeId, event) {
+            // Check if trying to select a new nominee when at max
+            if (this.votesRemaining === 0 && this.votes.indexOf(nomineeId) === -1) {
+              event.preventDefault();
+              this.showMaxVotesModal = true;
+            }
+          },
           getSavedVoter() {
             var voter_cookie = this.$cookies.get('voter');
             if(this.voter === 0 && (voter_cookie || this.$root.voter)) {
@@ -132,7 +160,7 @@
             }
           },
           navigateAway() {
-            if(this.position.status != 'vote') {
+            if(this.position.status != 'vote' && !this.$page.user) {
               console.log('navigating from vote to ' + this.position.status);
               this.$inertia.visit('/' + this.position.status);
             }

@@ -181,7 +181,7 @@
               });
           },
           navigateAway() {
-            if(this.position.status != 'rank') {
+            if(this.position.status != 'rank' && !this.$page.user) {
               console.log('navigating from rank to ' + this.position.status);
               this.$inertia.visit('/' + this.position.status);
             }
