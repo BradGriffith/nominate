@@ -66,6 +66,8 @@ class Nomination extends Model
 
       if($orderByCount) {
         $nominees_for_ranking->orderBy('votes_count','desc');
+      } else {
+        $nominees_for_ranking->orderBy('last_name')->orderBy('first_name');
       }
 
       return $nominees_for_ranking->get();

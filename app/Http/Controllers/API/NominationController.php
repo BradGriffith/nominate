@@ -20,6 +20,8 @@ class NominationController extends Controller
     {
         return Nomination::where('position_id', $request->get('position_id'))
           ->where('year', date('Y'))
+          ->orderBy('last_name')
+          ->orderBy('first_name')
           ->get();
     }
 
@@ -72,6 +74,7 @@ class NominationController extends Controller
         $year = date('Y');
         $toImport = 0;
         $duplicates = 0;
+        $seenInList = []; // Track nominees already seen in this import
 
         // Split by newlines
         $lines = preg_split('/\r\n|\r|\n/', $text);
@@ -104,7 +107,16 @@ class NominationController extends Controller
                 continue;
             }
 
-            // Check if nominee already exists (case-insensitive)
+            // Create normalized key for duplicate checking
+            $normalizedKey = strtolower($lastName) . '|' . strtolower($firstName);
+
+            // Check if already seen in this import list
+            if (isset($seenInList[$normalizedKey])) {
+                $duplicates++;
+                continue;
+            }
+
+            // Check if nominee already exists in database (case-insensitive)
             $exists = Nomination::where('position_id', $positionId)
                 ->where('year', $year)
                 ->whereRaw('LOWER(TRIM(first_name)) = ?', [strtolower($firstName)])
@@ -115,6 +127,7 @@ class NominationController extends Controller
                 $duplicates++;
             } else {
                 $toImport++;
+                $seenInList[$normalizedKey] = true; // Mark as seen
             }
         }
 
@@ -143,6 +156,7 @@ class NominationController extends Controller
         $added = 0;
         $skipped = 0;
         $errors = [];
+        $seenInList = []; // Track nominees already seen in this import
 
         // Split by newlines or commas
         $lines = preg_split('/\r\n|\r|\n/', $text);
@@ -179,7 +193,16 @@ class NominationController extends Controller
                 continue;
             }
 
-            // Check if nominee already exists (case-insensitive)
+            // Create normalized key for duplicate checking
+            $normalizedKey = strtolower($lastName) . '|' . strtolower($firstName);
+
+            // Check if already seen in this import list
+            if (isset($seenInList[$normalizedKey])) {
+                $skipped++;
+                continue;
+            }
+
+            // Check if nominee already exists in database (case-insensitive)
             $exists = Nomination::where('position_id', $positionId)
                 ->where('year', $year)
                 ->whereRaw('LOWER(TRIM(first_name)) = ?', [strtolower($firstName)])
@@ -190,6 +213,9 @@ class NominationController extends Controller
                 $skipped++;
                 continue;
             }
+
+            // Mark as seen in this import
+            $seenInList[$normalizedKey] = true;
 
             // Create nominee (store trimmed values)
             Nomination::create([
